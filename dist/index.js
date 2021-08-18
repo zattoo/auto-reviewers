@@ -9877,12 +9877,6 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
  * @prop {string} login
  */
 
-/**
- * @typedef {Object} ArtifactData
- * @prop {string[]} labels
- * @prop {OwnersMap} reviewers
- */
-
 
 /** @typedef {import('./utils').OwnersMap} OwnersMap */
 

@@ -65,25 +65,18 @@ describe(getOwnersMap.name, () => {
 });
 
 describe(getMetaFiles.name, () => {
-    it('gets label files', async () => {
-        const changedFiles = ['test/mocks/'];
-        expect(await getMetaFiles(changedFiles, '.owners')).toEqual(['/.owners']);
+    it('gets owners files', async () => {
+        const changedFiles = ['test/mocks/app/src/features/example.js'];
+        expect(await getMetaFiles(changedFiles, '.owners')).toEqual(['test/mocks/.owners']);
     });
 
-    it('gets label files for multiple files', async () => {
-        const changedFiles = ['test/projects/app/src/features/example.js', 'test/projects/cast/src/index.js'];
-        expect(await getMetaFiles(changedFiles, '.labels')).toEqual(['test/projects/app/.labels', 'test/projects/cast/.labels']);
+    it('gets owners files for multiple files', async () => {
+        const changedFiles = ['test/mocks/projects/app/src/features/example.js', 'test/mocks/projects/cast/src/index.js'];
+        expect(await getMetaFiles(changedFiles, '.owners')).toEqual(['test/mocks/projects/app/.owners', 'test/mocks/projects/cast/.owners']);
     });
 
     it('doesnt break on dot files', async () => {
         const changedFiles = ['.github/workflows/pr.yml'];
-        expect(await getMetaFiles(changedFiles, '.labels')).toEqual([null]);
-
-    });
-});
-
-describe(getMetaInfoFromFiles.name,  () => {
-    it('gets labels', async () => {
-        expect(await getMetaInfoFromFiles(['test/projects/app/.labels', 'test/projects/cast/.labels'])).toEqual(['project:app', 'project:common', 'project:cast']);
+        expect(await getMetaFiles(changedFiles, '.owners')).toEqual([]);
     });
 });
