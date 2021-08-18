@@ -1,42 +1,39 @@
 {
-  "name": "javascript-action",
-  "version": "1.0.0",
-  "description": "JavaScript Action Template",
-  "main": "src/index.js",
-  "scripts": {
-    "lint": "eslint .",
-    "build": "ncc build src/index.js -o dist --source-map --license licenses.txt",
-    "test": "jest",
-    "all": "npm run lint && npm run build && npm run test"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/actions/javascript-action.git"
-  },
-  "keywords": [
-    "GitHub",
-    "Actions",
-    "JavaScript"
-  ],
-  "author": "",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/actions/javascript-action/issues"
-  },
-  "homepage": "https://github.com/actions/javascript-action#readme",
-  "dependencies": {
-    "@actions/artifact": "0.5.2",
-    "@actions/core": "1.4.0",
-    "@actions/github": "5.0.0",
-    "@octokit/webhooks-definitions": "^3.67.3",
-    "fs-extra": "10.0.0",
-    "lodash": "^4.17.21",
-    "node-fetch": "^2.6.1"
-  },
-  "devDependencies": {
-    "@types/fs-extra": "9.0.12",
-    "@vercel/ncc": "0.28.0",
-    "eslint": "7.30.0",
-    "jest": "27.0.6"
-  }
+    "name": "label-on-changes",
+    "version": "2.0.0",
+    "description": "GitHub Action to recognize and label modified code areas.",
+    "main": "src/index.js",
+    "scripts": {
+        "lint": "eslint .",
+        "build": "ncc build src/index.js -o dist --source-map --license licenses.txt",
+        "test": "jest",
+        "all": "npm run lint && npm run build && npm run test"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/actions/javascript-action.git"
+    },
+    "keywords": [
+        "GitHub Actions",
+        "Labels",
+        "Recognize"
+    ],
+    "author": "",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/zattoo/label-on-changes/issues"
+    },
+    "homepage": "https://github.com/zattoo/label-on-changes#readme",
+    "dependencies": {
+        "@actions/core": "1.4.0",
+        "@actions/github": "5.0.0",
+        "fs-extra": "10.0.0",
+        "glob-promise": "4.2.0"
+    },
+    "devDependencies": {
+        "@types/fs-extra": "9.0.12",
+        "@vercel/ncc": "0.29.0",
+        "eslint": "7.32.0",
+        "jest": "27.0.6"
+    }
 }
