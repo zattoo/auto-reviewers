@@ -1,6 +1,6 @@
-# Labeler
+# Auto Reviewers
 
-GitHub Action to recognize areas in the code that were affected and label by metadata files
+GitHub Action to recognize and assign reviewers and codeowners
 
 ## Inputs
 
@@ -14,15 +14,15 @@ Required. GitHub token
 
 `string`
 
-Required. Filename which contain label metadata to look for
+Required. Filename which contain owners metadata to look for
 
 ## Usage
 
 ### Metadata file
 The metadata file contains list of labels separated by break-line between which should be assigned ot all sub-paths.
 ```yml
-# name: projects/common/.labels
-project:common
+# name: projects/common/.owners
+nitzanashi
 ```
 
 If the changed file was `projects/common/utils/time.js` the action will search for the closest `source` (e.g `.labels`)
@@ -31,15 +31,24 @@ In the current example `projects/common/.labels` is the closest one so all the l
 ### Workflow
 
 ````yaml
-name: Project recognition
+name: Auto Reviewers
+
+on:
+    pull_request_review:
+    pull_request:
+
 jobs:
     assign-labels:
         name: Assign labels
         runs-on: ubuntu-latest
         steps:
           - uses: actions/checkout@v2
-          - uses: zattoo/project-recognition@v1
+          - uses: zattoo/auto-reviewers@v1
             with:
-              token: ${{github.token}}
-              label_filename: '.labels'
+              token: ${{secrets.TOKEN}}
+              source: '.reviewers'
+              ignore_files: '
+                .owners
+                CHANGELOG.md
+              '
 ````

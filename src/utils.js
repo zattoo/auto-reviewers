@@ -1,11 +1,7 @@
 const fse = require('fs-extra');
-const {promisify} = require('util');
-const {exec} = require('child_process');
 const path = require('path');
 
 const {findNearestFile} = require('./find-nearest-file');
-
-const execPromise = promisify(exec);
 
 /**
  * @param {string[]} changedFiles
@@ -190,27 +186,13 @@ ${filesMap}
 `);
 };
 
-/**
- * @param {string} executionCode
- * @param {string} [cwd]
- */
-const execWithCatch = (executionCode, cwd = '') => {
-    return execPromise(executionCode, {
-        cwd,
-    }).catch((err) => {
-        return Promise.reject(err);
-    });
-};
-
 
 module.exports = {
     getMetaFiles,
     getMetaInfoFromFiles,
     filterChangedFiles,
-    execWithCatch,
     getOwnersMap,
     createReviewersComment,
-    removePrefixPathFromFile,
     createRequiredApprovalsComment,
 };
 
