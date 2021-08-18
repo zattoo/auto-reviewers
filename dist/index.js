@@ -9719,7 +9719,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
                 }),
                 octokit.rest.issues.createComment({
                     ...repo,
-                    pull_number,
+                    issue_number: pull_number,
                     body: utils.createReviewersComment(codeowners, PATH_PREFIX)
                 }),
             ]);
