@@ -46,7 +46,7 @@ jobs:
           - uses: zattoo/auto-reviewers@v1
             with:
               token: ${{secrets.TOKEN}}
-              source: '.reviewers'
+              source: '.owners'
               ignore_files: '
                 .owners
                 CHANGELOG.md
