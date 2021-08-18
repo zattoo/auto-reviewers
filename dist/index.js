@@ -9787,9 +9787,10 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     };
 
     core.startGroup('DEBUG');
-    console.log(Object.keys(context));
-    console.log(Object.keys(context.payload));
-    console.log(context.payload.sender);
+    // console.log(Object.keys(context));
+    // console.log(Object.keys(context.payload));
+    // console.log(context.payload.sender);
+    console.log(JSON.stringify(context.payload));
     core.endGroup();
 
     let [
