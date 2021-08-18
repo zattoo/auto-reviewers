@@ -9813,7 +9813,10 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
 
         case 'pull_request_review': {
             // We don't want to go into Infinite loop
-            if (context.payload.sender.login === user) {
+            if (
+                context.payload.sender.login === user  ||
+                context.payload.review.state === 'commented'
+            ) {
                 break;
             }
 
