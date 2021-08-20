@@ -9259,6 +9259,8 @@ const filterChangedFiles = (changedFiles, ignoreFiles) => {
         return !ignoreFiles.includes(file.split('/').pop());
     });
 
+    console.log(filteredFiles);
+
     if (filteredFiles.length) {
         return filteredFiles;
     }
