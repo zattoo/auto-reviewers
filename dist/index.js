@@ -9255,6 +9255,10 @@ const {findNearestFile} = __nccwpck_require__(9772);
  * @returns {string[]}
  */
 const filterChangedFiles = (changedFiles, ignoreFiles) => {
+    console.log({
+        changedFiles,
+        ignoreFiles,
+    });
     const filteredFiles = changedFiles.filter((file) => {
         return !ignoreFiles.includes(file.split('/').pop());
     });
