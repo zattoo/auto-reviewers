@@ -9255,15 +9255,9 @@ const {findNearestFile} = __nccwpck_require__(9772);
  * @returns {string[]}
  */
 const filterChangedFiles = (changedFiles, ignoreFiles) => {
-    console.log({
-        changedFiles,
-        ignoreFiles,
-    });
     const filteredFiles = changedFiles.filter((file) => {
         return !ignoreFiles.includes(file.split('/').pop());
     });
-
-    console.log(filteredFiles);
 
     if (filteredFiles.length) {
         return filteredFiles;
@@ -9763,6 +9757,8 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
                     message: 'No sufficient approvals',
                 });
             }
+
+            core.warning("No sufficient approvals can't approve the pull-request");
         } else {
             // Approve
             await octokit.rest.pulls.createReview({
