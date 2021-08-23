@@ -209,11 +209,10 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         }
 
         case 'pull_request_review': {
-            core.info(context.payload.review.state);
             // We don't want to go into Infinite loop
             if (
                 context.payload.sender.login !== user  &&
-                (/approved|dissmied/).test(context.payload.review.state)
+                (/approved|dismissed/).test(context.payload.review.state)
             ) {
                 await approvalProcess(codeowners, reviewers, changedFiles, true);
             }
