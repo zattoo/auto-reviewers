@@ -157,9 +157,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
 
         if (filesWhichStillNeedApproval.length > 0) {
             core.warning("No sufficient approvals can't approve the pull-request");
-            core.startGroup('Required Approval')
             core.info(utils.createRequiredApprovalsComment(codeowners, filesWhichStillNeedApproval, PATH_PREFIX));
-            core.endGroup();
 
             const approvedByTheCurrentUser = reviewers[user] && reviewers[user].state === 'APPROVED';
 
