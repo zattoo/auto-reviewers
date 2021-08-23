@@ -9390,7 +9390,7 @@ const createRequiredApprovalsComment = (codeowners, files, pathPrefix) => {
             return acc;
         }, []);
 
-        return `* ${removePrefixPathFromFile(file, pathPrefix)} (${fileOwners.join(', ')})`;
+        return `- ${removePrefixPathFromFile(file, pathPrefix)} (${fileOwners.join(', ')})`;
     }).join('\n');
 
     return (`Approval is still required for ${files.length} files\n${filesMap}`);
@@ -9615,7 +9615,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         const listFilesResponse = await octokit.paginate(listFilesOptions);
 
         const changedFiles = listFilesResponse.map((file) => {
-            core.info(` - ${file.filename}`);
+            core.info(`- ${file.filename}`);
 
             // @see https://docs.github.com/en/actions/reference/environment-variables
             return path.join(PATH_PREFIX, file.filename);

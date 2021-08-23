@@ -34,7 +34,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         const listFilesResponse = await octokit.paginate(listFilesOptions);
 
         const changedFiles = listFilesResponse.map((file) => {
-            core.info(` - ${file.filename}`);
+            core.info(`- ${file.filename}`);
 
             // @see https://docs.github.com/en/actions/reference/environment-variables
             return path.join(PATH_PREFIX, file.filename);

@@ -144,7 +144,7 @@ const createRequiredApprovalsComment = (codeowners, files, pathPrefix) => {
             return acc;
         }, []);
 
-        return `* ${removePrefixPathFromFile(file, pathPrefix)} (${fileOwners.join(', ')})`;
+        return `- ${removePrefixPathFromFile(file, pathPrefix)} (${fileOwners.join(', ')})`;
     }).join('\n');
 
     return (`Approval is still required for ${files.length} files\n${filesMap}`);
