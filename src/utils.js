@@ -136,42 +136,6 @@ const removePrefixPathFromFile = (file, pathPrefix) => {
 };
 
 /**
- * @param {OwnersMap} ownersMap
- * @param {string} pathPrefix
- * @returns {string}
- */
-const createReviewersComment = (ownersMap, pathPrefix) => {
-    const arrayToList = (array) => {
-        return (array.map((file) => `* \`${removePrefixPathFromFile(file, pathPrefix)}\``).join('\n'));
-    };
-
-    /**
-     * @param {string} owner
-     * @param {OwnerData} data
-     */
-    const createCollapsableInfo = (owner, data) => {
-        return (`
-<details>
- <summary>${owner} (${data.ownedFiles.length} files)</summary>
-
- ### Owned files:\n${arrayToList(data.ownedFiles)}
- ### sources:\n${arrayToList(data.sources)}
-</details>`
-        );
-    };
-
-    const AMOUNT = `Found ${Object.keys(ownersMap).length} Codeowners\n`;
-
-    const reviewersInfo = [];
-
-    Object.entries(ownersMap).forEach(([owner, data]) => {
-        reviewersInfo.push(createCollapsableInfo(owner, data));
-    })
-
-    return AMOUNT + reviewersInfo.join('\n');
-};
-
-/**
  * @param {OwnersMap} codeowners
  * @param {string[]} files
  * @param {string} pathPrefix
@@ -189,13 +153,7 @@ const createRequiredApprovalsComment = (codeowners, files, pathPrefix) => {
         return `* ${removePrefixPathFromFile(file, pathPrefix)} (${fileOwners.join(', ')})`;
     }).join('\n');
 
-    return (`
-<details>
-<summary>Approval is still required for ${files.length} files</summary>
-
-${filesMap}
-</details>
-`);
+    return (`Approval is still required for ${files.length} files\n${filesMap}`);
 };
 
 
@@ -204,7 +162,6 @@ module.exports = {
     getMetaInfoFromFiles,
     filterChangedFiles,
     getOwnersMap,
-    createReviewersComment,
     createRequiredApprovalsComment,
 };
 

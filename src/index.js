@@ -93,18 +93,11 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         core.info(`reviewers to add length ${reviewersToAdd.length}`);
 
         if (reviewersToAdd.length > 0) {
-            await Promise.all([
-                octokit.rest.pulls.requestReviewers({
-                    ...repo,
-                    pull_number,
-                    reviewers: reviewersToAdd,
-                }),
-                octokit.rest.issues.createComment({
-                    ...repo,
-                    issue_number: pull_number,
-                    body: utils.createReviewersComment(codeowners, PATH_PREFIX)
-                }),
-            ]);
+            await octokit.rest.pulls.requestReviewers({
+                ...repo,
+                pull_number,
+                reviewers: reviewersToAdd,
+            });
         }
 
         core.endGroup();
@@ -147,9 +140,12 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
      * @param {OwnersMap} codeowners
      * @param {string[]} reviewers
      * @param {string[]} changedFiles
-     * @returns {string[]}
+     * @param {boolean} [shouldDismiss]
+     * @returns {Promise<void>}
      */
-    const getApprovalRequiredFiles = (codeowners, reviewers, changedFiles) => {
+    const approvalProcess = async (codeowners, reviewers, changedFiles, shouldDismiss) => {
+        core.startGroup('Approval process');
+
         const approvers = Object.keys(reviewers).filter((reviewer) => {
             return reviewers[reviewer].state === 'APPROVED';
         });
@@ -161,11 +157,35 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
             return acc;
         }, []))];
 
-        const approvalRequiredFiles = changedFiles.filter((file) => {
+        const filesWhichStillNeedApproval = changedFiles.filter((file) => {
             return !allApprovedFiles.includes(file);
         });
 
-        return approvalRequiredFiles;
+
+        if (filesWhichStillNeedApproval.length > 0) {
+            core.info(utils.createRequiredApprovalsComment(codeowners, filesWhichStillNeedApproval, PATH_PREFIX));
+
+            const approvedByTheCurrentUser = reviewers[user] && reviewers[user].state === 'APPROVED';
+
+            if (approvedByTheCurrentUser && shouldDismiss) {
+                // Dismiss
+                await octokit.rest.pulls.dismissReview({
+                    ...repo,
+                    pull_number,
+                    review_id: reviewers[user].id,
+                    message: 'No sufficient approvals',
+                });
+            }
+        } else {
+            // Approve
+            await octokit.rest.pulls.createReview({
+                ...repo,
+                pull_number,
+                event: 'APPROVE',
+                body: 'All required approvals achieved, can merge now',
+            });
+        }
+        core.endGroup();
     };
 
     core.startGroup('DEBUG');
@@ -190,46 +210,17 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     switch (context.eventName) {
         case 'pull_request': {
             await assignReviewers(codeowners, Object.keys(reviewers));
+            await approvalProcess(codeowners, reviewers, changedFiles, true);
             break;
         }
 
         case 'pull_request_review': {
             // We don't want to go into Infinite loop
             if (
-                context.payload.sender.login === user  ||
-                context.payload.review.state === 'commented'
+                context.payload.sender.login !== user  &&
+                (/approved|dissmied/).test(context.payload.review.state)
             ) {
-                break;
-            }
-
-            const approvalRequiredFiles = getApprovalRequiredFiles(codeowners, reviewers, changedFiles);
-
-            if (approvalRequiredFiles.length > 0) {
-                await octokit.rest.issues.createComment({
-                    ...repo,
-                    issue_number: pull_request.number,
-                    body: utils.createRequiredApprovalsComment(codeowners, approvalRequiredFiles,PATH_PREFIX),
-                });
-
-                const approvedByTheCurrentUser = reviewers[user] && reviewers[user].state === 'APPROVED';
-
-                if (approvedByTheCurrentUser) {
-                    // Dismiss
-                    await octokit.rest.pulls.dismissReview({
-                        ...repo,
-                        pull_number,
-                        review_id: reviewers[user].id,
-                        message: 'No sufficient approvals',
-                    });
-                }
-            } else {
-                // Approve
-                await octokit.rest.pulls.createReview({
-                    ...repo,
-                    pull_number,
-                    event: 'APPROVE',
-                    body: 'All required approvals achieved, can merge now',
-                });
+                await approvalProcess(codeowners, reviewers, changedFiles, true);
             }
 
             break;
