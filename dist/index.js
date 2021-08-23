@@ -9600,7 +9600,6 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     const {repo} = context;
     const {pull_request} = context.payload;
     const pull_number = pull_request.number;
-    core.info(`pull number ${pull_number}`);
 
     /**
      * @returns {string[]}
@@ -9791,6 +9790,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         }
 
         case 'pull_request_review': {
+            core.info(context.payload.review.state);
             // We don't want to go into Infinite loop
             if (
                 context.payload.sender.login !== user  &&
