@@ -40,7 +40,8 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         });
 
         core.endGroup();
-        core.info('\n');
+        // break line
+        core.info('');
         return utils.filterChangedFiles(changedFiles, ignoreFiles)
     };
 
@@ -100,7 +101,8 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
             });
         }
 
-        core.info('\n');
+        // break line
+        core.info('');
     };
 
     /**
@@ -186,7 +188,8 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
                 body: 'All required approvals achieved, can merge now',
             });
         }
-        core.info('\n');
+        // break line
+        core.info('');
     };
 
     let [
