@@ -68,7 +68,6 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
      * @returns {Promise<OwnersMap>}
      */
     const assignReviewers = async (codeowners, reviewers) => {
-        core.info('\u001b[1mAssign Reviewers');
         const {repo} = context;
 
         /** @type {string[]} */
@@ -90,9 +89,6 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         const reviewersFromFiles = Object.keys(codeowners);
         const reviewersToAdd = reviewersFromFiles.filter((reviewer) => !reviewersOnPr.includes(reviewer));
 
-        core.info(`Reviewers assigned to pull-request: ${reviewersOnPr.join(', ')}`);
-        core.info(`Reviewers to add: ${reviewersToAdd.join(', ')}`);
-
         if (reviewersToAdd.length > 0) {
             await octokit.rest.pulls.requestReviewers({
                 ...repo,
@@ -100,9 +96,6 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
                 reviewers: reviewersToAdd,
             });
         }
-
-        // break line
-        core.info('');
     };
 
     /**
@@ -146,8 +139,6 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
      * @returns {Promise<void>}
      */
     const approvalProcess = async (codeowners, reviewers, changedFiles, shouldDismiss) => {
-        core.info('\u001b[1mApproval process');
-
         const approvers = Object.keys(reviewers).filter((reviewer) => {
             return reviewers[reviewer].state === 'APPROVED';
         });
@@ -166,7 +157,9 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
 
         if (filesWhichStillNeedApproval.length > 0) {
             core.warning("No sufficient approvals can't approve the pull-request");
+            core.startGroup('Required Approval')
             core.info(utils.createRequiredApprovalsComment(codeowners, filesWhichStillNeedApproval, PATH_PREFIX));
+            core.endGroup();
 
             const approvedByTheCurrentUser = reviewers[user] && reviewers[user].state === 'APPROVED';
 
