@@ -179,8 +179,6 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
                 body: 'All required approvals achieved, can merge now',
             });
         }
-        // break line
-        core.info('');
     };
 
     let [
@@ -197,8 +195,11 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
 
     switch (context.eventName) {
         case 'pull_request': {
-            await assignReviewers(codeowners, Object.keys(reviewers));
-            await approvalProcess(codeowners, reviewers, changedFiles, true);
+            await Promise.all([
+                assignReviewers(codeowners, Object.keys(reviewers)),
+                approvalProcess(codeowners, reviewers, changedFiles, true),
+            ]);
+
             break;
         }
 
