@@ -176,6 +176,8 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
                     message: 'No sufficient approvals',
                 });
             }
+
+            core.warning("No sufficient approvals can't approve the pull-request");
         } else {
             // Approve
             await octokit.rest.pulls.createReview({

@@ -9,15 +9,9 @@ const {findNearestFile} = require('./find-nearest-file');
  * @returns {string[]}
  */
 const filterChangedFiles = (changedFiles, ignoreFiles) => {
-    console.log({
-        changedFiles,
-        ignoreFiles,
-    });
     const filteredFiles = changedFiles.filter((file) => {
         return !ignoreFiles.includes(file.split('/').pop());
     });
-
-    console.log(filteredFiles);
 
     if (filteredFiles.length) {
         return filteredFiles;
