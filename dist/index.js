@@ -9621,6 +9621,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         });
 
         core.endGroup();
+        core.info('\n');
         return utils.filterChangedFiles(changedFiles, ignoreFiles)
     };
 
@@ -9647,7 +9648,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
      * @returns {Promise<OwnersMap>}
      */
     const assignReviewers = async (codeowners, reviewers) => {
-        core.startGroup('Assign Reviewers');
+        core.info('\u001b[1mAssign Reviewers');
         const {repo} = context;
 
         /** @type {string[]} */
@@ -9669,9 +9670,8 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         const reviewersFromFiles = Object.keys(codeowners);
         const reviewersToAdd = reviewersFromFiles.filter((reviewer) => !reviewersOnPr.includes(reviewer));
 
-        core.info(`Reviewers assigned to pull-request: ${reviewersOnPr}`);
-        core.info(`Reviewers to add: ${reviewersToAdd}`);
-        core.info(`reviewers to add length ${reviewersToAdd.length}`);
+        core.info(`Reviewers assigned to pull-request: ${reviewersOnPr.join(', ')}`);
+        core.info(`Reviewers to add: ${reviewersToAdd.join(', ')}`);
 
         if (reviewersToAdd.length > 0) {
             await octokit.rest.pulls.requestReviewers({
@@ -9681,7 +9681,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
             });
         }
 
-        core.endGroup();
+        core.info('\n');
     };
 
     /**
@@ -9725,7 +9725,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
      * @returns {Promise<void>}
      */
     const approvalProcess = async (codeowners, reviewers, changedFiles, shouldDismiss) => {
-        core.startGroup('Approval process');
+        core.info('\u001b[1mApproval process');
 
         const approvers = Object.keys(reviewers).filter((reviewer) => {
             return reviewers[reviewer].state === 'APPROVED';
@@ -9767,7 +9767,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
                 body: 'All required approvals achieved, can merge now',
             });
         }
-        core.endGroup();
+        core.info('\n');
     };
 
     let [
