@@ -25,6 +25,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
      * @returns {string[]}
      */
     const getChangedFiles = async () => {
+        core.startGroup('Changed Files');
         const listFilesOptions = octokit.rest.pulls.listFiles.endpoint.merge({
             ...context.repo,
             pull_number,
@@ -32,7 +33,6 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
 
         const listFilesResponse = await octokit.paginate(listFilesOptions);
 
-        core.info("Changed files:");
         const changedFiles = listFilesResponse.map((file) => {
             core.info(` - ${file.filename}`);
 
@@ -40,6 +40,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
             return path.join(PATH_PREFIX, file.filename);
         });
 
+        core.endGroup();
         return utils.filterChangedFiles(changedFiles, ignoreFiles)
     };
 
@@ -163,7 +164,8 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
 
 
         if (filesWhichStillNeedApproval.length > 0) {
-            core.warning(utils.createRequiredApprovalsComment(codeowners, filesWhichStillNeedApproval, PATH_PREFIX));
+            core.warning("No sufficient approvals can't approve the pull-request");
+            core.info(utils.createRequiredApprovalsComment(codeowners, filesWhichStillNeedApproval, PATH_PREFIX));
 
             const approvedByTheCurrentUser = reviewers[user] && reviewers[user].state === 'APPROVED';
 
