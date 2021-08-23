@@ -181,7 +181,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         }
     };
 
-    let [
+    const [
         changedFiles,
         reviewers,
         user,
