@@ -163,7 +163,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
 
 
         if (filesWhichStillNeedApproval.length > 0) {
-            core.info(utils.createRequiredApprovalsComment(codeowners, filesWhichStillNeedApproval, PATH_PREFIX));
+            core.warning(utils.createRequiredApprovalsComment(codeowners, filesWhichStillNeedApproval, PATH_PREFIX));
 
             const approvedByTheCurrentUser = reviewers[user] && reviewers[user].state === 'APPROVED';
 
@@ -176,8 +176,6 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
                     message: 'No sufficient approvals',
                 });
             }
-
-            core.warning("No sufficient approvals can't approve the pull-request");
         } else {
             // Approve
             await octokit.rest.pulls.createReview({
@@ -189,13 +187,6 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         }
         core.endGroup();
     };
-
-    core.startGroup('DEBUG');
-    // console.log(Object.keys(context));
-    // console.log(Object.keys(context.payload));
-    // console.log(context.payload.sender);
-    console.log(JSON.stringify(context.payload));
-    core.endGroup();
 
     let [
         changedFiles,
