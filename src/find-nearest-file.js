@@ -26,7 +26,7 @@ const nextLevelUp = (directory) => {
  * @returns {string[]}
  */
 const findFiles = async (filename, directory, regex, foundFiles = []) => {
-    const match = regex.exc(filename);
+    const match = regex.exec(filename);
 
     if(!match && foundFiles.length > 0) {
         return foundFiles;
