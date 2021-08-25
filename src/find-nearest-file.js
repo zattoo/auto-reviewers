@@ -35,15 +35,15 @@ const findFiles = async (filename, directory, regex, foundFiles = []) => {
     // if no regex and we already found something just return it
     if (!regex && foundFiles.length > 0) {
         return foundFiles;
-    }
+    } else if(regex) {
+        const match = regex.exec(file);
+        // reset regex
+        regex.lastIndex = 0;
 
-    const match = regex.exec(file);
-    // reset regex
-    regex.lastIndex = 0;
-
-    // if no match and we already found something just return it
-    if (!match && foundFiles.length > 0) {
-        return foundFiles;
+        // if no match and we already found something just return it
+        if (!match && foundFiles.length > 0) {
+            return foundFiles;
+        }
     }
 
     const nextDirectory = nextLevelUp(directory);
