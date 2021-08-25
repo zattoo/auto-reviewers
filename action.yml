@@ -10,6 +10,9 @@ inputs:
   token:
     description: 'GitHub token'
     required: true
+  labels_map:
+    description: 'Key Value object of Labels and paths which describe the owners level'
+    required: false
 runs:
   using: 'node12'
   main: 'dist/index.js'

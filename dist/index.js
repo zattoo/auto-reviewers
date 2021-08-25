@@ -9594,12 +9594,17 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     const token = core.getInput('token', {required: true});
     const ownersFilename = core.getInput('source', {required: true});
     const ignoreFiles = core.getMultilineInput('ignore_files', {required: true});
+    const labelsMap = JSON.parse(core.getInput('labels_map', {required: false}));
 
     const octokit = getOctokit(token);
 
     const {repo} = context;
     const {pull_request} = context.payload;
     const pull_number = pull_request.number;
+
+    core.startGroup('DEBUG')
+    core.info(JSON.stringify(labelsMap));
+    core.endGroup();
 
     /**
      * @returns {string[]}
