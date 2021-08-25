@@ -77,7 +77,8 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
      * @returns {string}
      */
     const getReviewersLevel = async () => {
-        const DEFAULT_LEVEL = '**';
+        // no level
+        const DEFAULT_LEVEL = '';
 
         if (!labelsMap) {
             return DEFAULT_LEVEL;
@@ -109,7 +110,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
                 const isSubDir = relative && !relative.startsWith("..") && !path.isAbsolute(relative);
 
                 return isSubDir ? nextPath : currentPath;
-            }, DEFAULT_LEVEL);
+            }, '**');
         }
     };
 
