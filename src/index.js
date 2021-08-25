@@ -63,8 +63,6 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     const getCodeOwners = async (createdBy, changedFiles, level) => {
         let reviewersFiles = await utils.getMetaFiles(changedFiles, ownersFilename, utils.getRegex(level, PATH_PREFIX));
 
-        core.info(reviewersFiles);
-
         if (reviewersFiles.length <= 0) {
             reviewersFiles = [ownersFilename];
         }
