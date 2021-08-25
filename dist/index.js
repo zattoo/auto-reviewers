@@ -9480,8 +9480,17 @@ const nextLevelUp = (directory) => {
  *
  * @param {string} filename
  * @param {string} directory
+ * @param {RegExp} regex
+ * @param {string[]} [foundFiles]
+ * @returns {string[]}
  */
-const findFile = async (filename, directory) => {
+const findFiles = async (filename, directory, regex, foundFiles = []) => {
+    const match = regex.test(filename);
+
+    if(!match && foundFiles.length > 0) {
+        return  null
+    }
+
     if (!directory) {
         return null;
     }
@@ -9493,12 +9502,12 @@ const findFile = async (filename, directory) => {
         const fileExists = await fse.pathExists(file);
 
         if (fileExists) {
-            return file;
+            foundFiles.push(file);
         }
 
-        return await findFile(filename, nextDirectory);
+        return findFiles(filename, nextDirectory, regex, foundFiles);
     } catch (e) {
-        return await findFile(filename, nextDirectory);
+        return findFiles(filename, nextDirectory, regex, foundFiles);
     }
 };
 
@@ -9506,8 +9515,10 @@ const findFile = async (filename, directory) => {
  *
  * @param {string} filename
  * @param {string} root
+ * @param {RegExp} regex
+ * @returns {string[]}
  */
-const findNearestFile = async (filename, root) => {
+const findNearestFile = async (filename, root, regex) => {
     if (!filename) {
         throw new Error('filename is required');
     }
@@ -9516,7 +9527,7 @@ const findNearestFile = async (filename, root) => {
         throw new Error('filename must be just a filename and not a path')
     }
 
-    return await findFile(filename, root);
+    return findFiles(filename, root, regex);
 };
 
 module.exports = {findNearestFile}
@@ -9597,18 +9608,12 @@ const filterChangedFiles = (changedFiles, ignoreFiles) => {
  */
 const getMetaFiles = async (changedFiles, filename, regex) => {
     const queue = changedFiles.map(async (filePath) => {
-        const match = regex.exec(filePath);
-
-        if (!(match)) {
-            return await findNearestFile(filename, filePath);
-        } else {
-            return await findNearestFile(filename, match[0]);
-        }
+        return findNearestFile(filename, filePath,regex);
     });
 
     const results = await Promise.all(queue);
 
-    return [...new Set(results)].filter(Boolean);
+    return [...new Set(results.flat())].filter(Boolean);
 };
 
 /**
