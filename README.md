@@ -16,6 +16,18 @@ Required. GitHub token
 
 Required. Filename which contain owners metadata to look for
 
+### `ignore_files`
+
+`multiLine string`
+
+Optional. list of files which the action should ignore when assigning reviewers, If no other changed files except ignore ones, the action will assign root level owners
+
+### `labels_map`
+
+`key-value pair object`
+
+Optional. a key-value object, where keys are `labels` and values are a glob of a `path` in the code. If specific label added to a Pull-request, the action will assign reviewers according to the map
+
 ## Usage
 
 ### Metadata file
@@ -31,24 +43,36 @@ In the current example `projects/common/.labels` is the closest one so all the l
 ### Workflow
 
 ````yaml
-name: Auto Reviewers
+  name: Reviewers
 
-on:
-    pull_request_review:
-    pull_request:
+  on:
+      pull_request_review:
+      pull_request:
+          types: [
+                  opened,
+                  ready_for_review,
+                  reopened,
+                  synchronize,
+                  labeled,
+                  unlabeled,
+          ]
 
-jobs:
-    assign-labels:
-        name: Assign labels
-        runs-on: ubuntu-latest
-        steps:
-          - uses: actions/checkout@v2
-          - uses: zattoo/auto-reviewers@v1
-            with:
-              token: ${{secrets.TOKEN}}
-              source: '.owners'
-              ignore_files: '
-                .owners
-                CHANGELOG.md
-              '
+  jobs:
+      reviewers:
+          name: Reviewers
+          runs-on: ubuntu-latest
+          steps:
+              - uses: actions/checkout@v2
+              - uses: zattoo/reviewers@levels
+                with:
+                    token: ${{secrets.TOKEN}}
+                    source: '.owners'
+                    ignore_files: |
+                        CHANGELOG.md
+                        Another file
+                    labels_map: |
+                        {
+                          "reviewers-projects": "**/projects/*",
+                          "reviewers-platform": "/"
+                        }
 ````
