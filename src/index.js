@@ -51,6 +51,15 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         return utils.filterChangedFiles(changedFiles, ignoreFiles)
     };
 
+    const getLabels = async () => {
+        const labels = await octokit.rest.issues.listLabelsOnIssue({
+            ...context.repo,
+            issue_number: pull_number,
+        });
+
+        return labels.map((label) => label.name);
+    };
+
     /**
      * @param {string} createdBy
      * @param {string[]} changedFiles
@@ -70,7 +79,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     /**
      * @returns {string}
      */
-    const getReviewersLevel = () => {
+    const getReviewersLevel = async () => {
         const DEFAULT_LEVEL = '**';
 
         if (!labelsMap) {
@@ -83,7 +92,8 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
             return DEFAULT_LEVEL;
         }
 
-        const labelsOnPR = pull_request.labels.map((label) => label.name);
+        const labelsOnPR = await getLabels();
+        core.info(`labels on PR: ${labelsOnPR}`);
         const labelsBelongsToAction = Object.keys(labelsMap);
 
         const matchedLabels = labelsOnPR.filter((label) => {
@@ -227,20 +237,20 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         }
     };
 
-    const level = getReviewersLevel();
-    core.info(`level is: ${level}`);
-
     const [
         changedFiles,
         reviewers,
         user,
+        level,
     ] = await Promise.all([
         getChangedFiles(),
         getReviewers(),
         getUser(),
+        getReviewersLevel,
     ]);
 
     const codeowners = await getCodeOwners(pull_request.user.login, changedFiles);
+    core.info(`level is: ${level}`);
 
     switch (context.eventName) {
         case 'pull_request': {
