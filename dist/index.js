@@ -9594,11 +9594,18 @@ const filterChangedFiles = (changedFiles, ignoreFiles) => {
 /**
  * @param {string[]} changedFiles
  * @param {string} filename
+ * @param {RegExp} regex
  * @returns {string[]}
  */
-const getMetaFiles = async (changedFiles, filename) => {
+const getMetaFiles = async (changedFiles, filename, regex) => {
     const queue = changedFiles.map(async (filePath) => {
-        return await findNearestFile(filename, filePath);
+        const match = regex.exec(filePath);
+
+        if (!(match)) {
+            return await findNearestFile(filename, filePath);
+        } else {
+            return await findNearestFile(filename, match[0]);
+        }
     });
 
     const results = await Promise.all(queue);
@@ -9974,16 +9981,18 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
      * @param {string} level
      */
     const getCodeOwners = async (createdBy, changedFiles, level) => {
-        let reviewersFiles = await utils.getMetaFiles(changedFiles, ownersFilename);
+        const regex = utils.getRegex(level, PATH_PREFIX);
 
-        const Regex = utils.getRegex(level, PATH_PREFIX);
-        console.log(Regex);
+        let reviewersFiles = await utils.getMetaFiles(changedFiles, ownersFilename, regex);
+
+        core.info(reviewersFiles);
 
         if (reviewersFiles.length <= 0) {
             reviewersFiles = [ownersFilename];
         }
 
         const reviewersMap = await utils.getMetaInfoFromFiles(reviewersFiles);
+
 
         return utils.getOwnersMap(reviewersMap, changedFiles, createdBy);
     };
