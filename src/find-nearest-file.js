@@ -26,19 +26,19 @@ const nextLevelUp = (directory) => {
  * @returns {string[]}
  */
 const findFiles = async (filename, directory, regex, foundFiles = []) => {
-    console.log(regex);
-    const match = regex.exec(directory);
-    console.log(`- file: ${directory}, match: ${match}`);
-
-    if(!match && foundFiles.length > 0) {
-        return foundFiles;
-    }
-
     if (!directory) {
         return foundFiles;
     }
 
     const file = path.join(directory, filename);
+
+    const match = regex.exec(file);
+    console.log(`- file: ${file}, match: ${match}`);
+
+    if(!match && foundFiles.length > 0) {
+        return foundFiles;
+    }
+
     const nextDirectory = nextLevelUp(directory);
 
     try {
