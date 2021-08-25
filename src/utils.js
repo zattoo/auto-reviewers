@@ -13,8 +13,6 @@ const {findNearestFile} = require('./find-nearest-file');
 const getRegex = (level, pathPrefix) => {
     const combinedPath = path.join(pathPrefix, level);
 
-    console.log(combinedPath);
-
     return globToRegExp(combinedPath, {
         flags: "ig",
         globstar: true,
@@ -70,18 +68,12 @@ const filterChangedFiles = (changedFiles, ignoreFiles) => {
  */
 const getMetaFiles = async (changedFiles, filename, regex) => {
     const queue = changedFiles.map(async (filePath) => {
-        const match = regex.exec(filePath);
-
-        if (!(match)) {
-            return await findNearestFile(filename, filePath);
-        } else {
-            return await findNearestFile(filename, match[0]);
-        }
+        return findNearestFile(filename, filePath,regex);
     });
 
     const results = await Promise.all(queue);
 
-    return [...new Set(results)].filter(Boolean);
+    return [...new Set(results.flat())].filter(Boolean);
 };
 
 /**

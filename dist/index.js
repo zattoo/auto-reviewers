@@ -9542,8 +9542,6 @@ const {findNearestFile} = __nccwpck_require__(9772);
 const getRegex = (level, pathPrefix) => {
     const combinedPath = path.join(pathPrefix, level);
 
-    console.log(combinedPath);
-
     return globToRegExp(combinedPath, {
         flags: "ig",
         globstar: true,
@@ -9936,11 +9934,6 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     const {pull_request} = context.payload;
     const pull_number = pull_request.number;
 
-    core.startGroup('DEBUG')
-    core.info(JSON.stringify(labelsMap));
-    core.info(JSON.stringify(Object.keys(pull_request)));
-    core.endGroup();
-
     /**
      * @returns {string[]}
      */
@@ -9981,9 +9974,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
      * @param {string} level
      */
     const getCodeOwners = async (createdBy, changedFiles, level) => {
-        const regex = utils.getRegex(level, PATH_PREFIX);
-
-        let reviewersFiles = await utils.getMetaFiles(changedFiles, ownersFilename, regex);
+        let reviewersFiles = await utils.getMetaFiles(changedFiles, ownersFilename, utils.getRegex(level, PATH_PREFIX));
 
         core.info(reviewersFiles);
 
@@ -9992,10 +9983,6 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         }
 
         const reviewersMap = await utils.getMetaInfoFromFiles(reviewersFiles);
-
-        core.info(JSON.stringify(reviewersMap));
-
-
         return utils.getOwnersMap(reviewersMap, changedFiles, createdBy);
     };
 
@@ -10030,14 +10017,12 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         } else {
             const labelsPaths = matchedLabels.map((label) => labelsMap[label]);
 
-            const label = labelsPaths.reduce((currentPath, nextPath) => {
+            return labelsPaths.reduce((currentPath, nextPath) => {
                 const relative = path.relative(nextPath, currentPath);
-                const isSubdir = relative && !relative.startsWith("..") && !path.isAbsolute(relative);
+                const isSubDir = relative && !relative.startsWith("..") && !path.isAbsolute(relative);
 
-                return isSubdir ? nextPath : currentPath;
+                return isSubDir ? nextPath : currentPath;
             }, DEFAULT_LEVEL);
-
-            return label;
         }
     };
 
