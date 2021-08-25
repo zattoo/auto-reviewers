@@ -9993,6 +9993,8 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
 
         const reviewersMap = await utils.getMetaInfoFromFiles(reviewersFiles);
 
+        core.info(JSON.stringify(reviewersMap));
+
 
         return utils.getOwnersMap(reviewersMap, changedFiles, createdBy);
     };
