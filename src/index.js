@@ -23,6 +23,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
 
     core.startGroup('DEBUG')
     core.info(JSON.stringify(labelsMap));
+    core.info(JSON.stringify(Object.keys(pull_request)));
     core.endGroup();
 
     /**
@@ -63,8 +64,48 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
 
         const reviewersMap = await utils.getMetaInfoFromFiles(reviewersFiles);
 
-        const ownersMap = utils.getOwnersMap(reviewersMap, changedFiles, createdBy);
-        return ownersMap;
+        return utils.getOwnersMap(reviewersMap, changedFiles, createdBy);
+    };
+
+    /**
+     * @returns {string}
+     */
+    const getReviewersLevel = () => {
+        const DEFAULT_LEVEL = '**';
+
+        if (!labelsMap) {
+            return DEFAULT_LEVEL;
+        }
+
+        // early exit if not a valid map
+        if (!utils.validateLabelsMap(labelsMap)){
+            core.warning('labels_map does not have a valid structure ')
+            return DEFAULT_LEVEL;
+        }
+
+        const labelsOnPR = pull_request.labels.map((label) => label.name);
+        const labelsBelongsToAction = Object.keys(labelsMap);
+
+        const matchedLabels = labelsOnPR.filter((label) => {
+            return labelsBelongsToAction.includes(label);
+        });
+
+        if (matchedLabels.length <= 0) {
+            return DEFAULT_LEVEL;
+        } else if(matchedLabels.length === 1) {
+            return labelsMap[matchedLabels[0]];
+        } else {
+            const labelsPaths = matchedLabels.map((label) => labelsMap[label]);
+
+            const label = labelsPaths.reduce((currentPath, nextPath) => {
+                const relative = path.relative(nextPath, currentPath);
+                const isSubdir = relative && !relative.startsWith("..") && !path.isAbsolute(relative);
+
+                return isSubdir ? nextPath : currentPath;
+            }, DEFAULT_LEVEL);
+
+            return label;
+        }
     };
 
     /**
@@ -181,10 +222,13 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
                 ...repo,
                 pull_number,
                 event: 'APPROVE',
-                body: 'All required approvals achieved, can merge now',
+                body: '',
             });
         }
     };
+
+    const level = getReviewersLevel();
+    core.info(`level is: ${level}`);
 
     const [
         changedFiles,

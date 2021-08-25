@@ -1,7 +1,32 @@
 const fse = require('fs-extra');
 const path = require('path');
+const isPlainObject = require('lodash.isplainobject');
 
 const {findNearestFile} = require('./find-nearest-file');
+
+/**
+ * @param {Record<string, string>}labelsMap
+ * @returns {boolean}
+ */
+const validateLabelsMap = (labelsMap) => {
+    if (!isPlainObject(labelsMap)) {
+        return false;
+    }
+
+    for (let label in Object.keys(labelsMap)) {
+        if (typeof label !== 'string') {
+            return false;
+        }
+    }
+
+    for (let path in Object.values(labelsMap)) {
+        if (typeof path !== 'string') {
+            return false;
+        }
+    }
+
+    return true;
+};
 
 /**
  * @param {string[]} changedFiles
@@ -157,6 +182,7 @@ module.exports = {
     filterChangedFiles,
     getOwnersMap,
     createRequiredApprovalsComment,
+    validateLabelsMap,
 };
 
 /** @typedef {Record<string, string[]>} InfoMap */
