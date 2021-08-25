@@ -36,6 +36,7 @@ const findFiles = async (filename, directory, regex, foundFiles = []) => {
     console.log(`- file: ${file}, match: ${match}`);
 
     if(!match && foundFiles.length > 0) {
+        console.log('finish', directory);
         return foundFiles;
     }
 
