@@ -26,6 +26,7 @@ const nextLevelUp = (directory) => {
  * @returns {string[]}
  */
 const findFiles = async (filename, directory, regex, foundFiles = []) => {
+    console.log(foundFiles);
     if (!directory) {
         return foundFiles;
     }
