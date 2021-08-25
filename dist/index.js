@@ -9527,7 +9527,9 @@ const findNearestFile = async (filename, root, regex) => {
         throw new Error('filename must be just a filename and not a path')
     }
 
-    return findFiles(filename, root, regex);
+    const files = await findFiles(filename, root, regex);
+    console.log(`filename: ${filename} : files: ${files.join(', ')}`);
+    return files;
 };
 
 module.exports = {findNearestFile}
