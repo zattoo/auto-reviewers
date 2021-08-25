@@ -11,7 +11,11 @@ const {findNearestFile} = require('./find-nearest-file');
  * @returns {RegExp}
  */
 const getRegex = (level, pathPrefix) => {
-    const combinedPath = level ? path.join(pathPrefix, level) : '';
+    if (!level) {
+        return null;
+    }
+
+    const combinedPath = path.join(pathPrefix, level);
 
     return globToRegExp(combinedPath, {
         flags: 'ig',

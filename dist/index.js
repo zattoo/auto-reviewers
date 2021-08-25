@@ -9492,11 +9492,14 @@ const findFiles = async (filename, directory, regex, foundFiles = []) => {
 
     const file = path.join(directory, filename);
 
+    if (!regex && foundFiles) {
+        return foundFiles;
+    }
+
     const match = regex.exec(file);
-    regex.lastIndex = 0;
     console.log(`- file: ${file}, match: ${match}`);
 
-    if(!Boolean(match) && foundFiles.length > 0) {
+    if(!match && foundFiles.length > 0) {
         console.log('finish', directory);
         return foundFiles;
     }
@@ -9559,7 +9562,11 @@ const {findNearestFile} = __nccwpck_require__(9772);
  * @returns {RegExp}
  */
 const getRegex = (level, pathPrefix) => {
-    const combinedPath = level ? path.join(pathPrefix, level) : '';
+    if (!level) {
+        return null;
+    }
+
+    const combinedPath = path.join(pathPrefix, level);
 
     return globToRegExp(combinedPath, {
         flags: 'ig',
