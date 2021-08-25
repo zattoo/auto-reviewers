@@ -9999,7 +9999,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         getChangedFiles(),
         getReviewers(),
         getUser(),
-        getReviewersLevel,
+        getReviewersLevel(),
     ]);
 
     const codeowners = await getCodeOwners(pull_request.user.login, changedFiles);
