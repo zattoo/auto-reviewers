@@ -9492,11 +9492,7 @@ const findFiles = async (filename, directory, regex, foundFiles = []) => {
 
     const file = path.join(directory, filename);
 
-    if (!regex && foundFiles) {
-        return foundFiles;
-    }
-
-    const match = regex.exec(file);
+    const match = regex && regex.exec(file);
     console.log(`- file: ${file}, match: ${match}`);
 
     if(!match && foundFiles.length > 0) {
