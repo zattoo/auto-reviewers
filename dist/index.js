@@ -9485,23 +9485,23 @@ const nextLevelUp = (directory) => {
  * @returns {string[]}
  */
 const findFiles = async (filename, directory, regex, foundFiles = []) => {
-    console.log(foundFiles);
     if (!directory) {
         return foundFiles;
     }
 
     const file = path.join(directory, filename);
 
+    // if no regex and we already found something just return it
     if (!regex && foundFiles.length > 0) {
         return foundFiles;
     }
 
     const match = regex.exec(file);
+    // reset regex
     regex.lastIndex = 0;
-    console.log(`- file: ${file}, match: ${match}`);
 
-    if(!match && foundFiles.length > 0) {
-        console.log('finish', directory);
+    // if no match and we already found something just return it
+    if (!match && foundFiles.length > 0) {
         return foundFiles;
     }
 
@@ -10025,7 +10025,6 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         }
 
         const labelsOnPR = await getLabels();
-        core.info(`labels on PR: ${labelsOnPR}`);
         const labelsBelongsToAction = Object.keys(labelsMap);
 
         const matchedLabels = labelsOnPR.filter((label) => {

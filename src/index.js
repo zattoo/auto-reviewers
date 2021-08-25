@@ -91,7 +91,6 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         }
 
         const labelsOnPR = await getLabels();
-        core.info(`labels on PR: ${labelsOnPR}`);
         const labelsBelongsToAction = Object.keys(labelsMap);
 
         const matchedLabels = labelsOnPR.filter((label) => {
