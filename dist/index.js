@@ -9559,7 +9559,7 @@ const {findNearestFile} = __nccwpck_require__(9772);
  * @returns {RegExp}
  */
 const getRegex = (level, pathPrefix) => {
-    const combinedPath = path.join(pathPrefix, level);
+    const combinedPath = level ? path.join(pathPrefix, level) : '';
 
     return globToRegExp(combinedPath, {
         flags: 'ig',
