@@ -68,7 +68,7 @@ const findNearestFile = async (filename, root, regex) => {
     }
 
     if (filename.indexOf('/') !== -1 || filename === '..') {
-        throw new Error('filename must be just a filename and not a path')
+        throw new Error('filename must be just a filename and not a path');
     }
 
     const files = await findFiles(filename, root, regex);
