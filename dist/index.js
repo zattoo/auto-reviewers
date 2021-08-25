@@ -9488,11 +9488,11 @@ const findFiles = async (filename, directory, regex, foundFiles = []) => {
     const match = regex.test(filename);
 
     if(!match && foundFiles.length > 0) {
-        return  null
+        return foundFiles;
     }
 
     if (!directory) {
-        return null;
+        return foundFiles;
     }
 
     const file = path.join(directory, filename);
