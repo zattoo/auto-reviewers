@@ -9810,9 +9810,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
             issue_number: pull_number,
         });
 
-        core.info(JSON.stringify(labels));
-
-        return labels.map((label) => label.name);
+        return labels.data.map((label) => label.name);
     };
 
     /**
