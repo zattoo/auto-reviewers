@@ -9493,6 +9493,7 @@ const findFiles = async (filename, directory, regex, foundFiles = []) => {
     const file = path.join(directory, filename);
 
     const match = regex.exec(file);
+    regex.lastIndex = 0;
     console.log(`- file: ${file}, match: ${match}`);
 
     if(!Boolean(match) && foundFiles.length > 0) {
@@ -9561,7 +9562,7 @@ const getRegex = (level, pathPrefix) => {
     const combinedPath = path.join(pathPrefix, level);
 
     return globToRegExp(combinedPath, {
-        flags: 'i',
+        flags: 'ig',
         globstar: true,
     });
 };
