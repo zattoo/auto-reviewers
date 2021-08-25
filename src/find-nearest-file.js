@@ -62,6 +62,7 @@ const findFiles = async (filename, directory, regex, foundFiles = []) => {
  * @returns {string[]}
  */
 const findNearestFile = async (filename, root, regex) => {
+    console.log(regex);
     if (!filename) {
         throw new Error('filename is required');
     }
