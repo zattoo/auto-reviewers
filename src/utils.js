@@ -1,8 +1,25 @@
 const fse = require('fs-extra');
 const path = require('path');
 const isPlainObject = require('lodash.isplainobject');
+const globToRegExp = require("glob-to-regexp");
 
 const {findNearestFile} = require('./find-nearest-file');
+
+/**
+ * @param {string} level
+ * @param {string} pathPrefix
+ * @returns {RegExp}
+ */
+const getRegex = (level, pathPrefix) => {
+    const combinedPath = path.join(pathPrefix, level);
+
+    console.log(combinedPath);
+
+    return globToRegExp(combinedPath, {
+        flags: "ig",
+        globstar: true,
+    });
+};
 
 /**
  * @param {Record<string, string>}labelsMap
@@ -183,6 +200,7 @@ module.exports = {
     getOwnersMap,
     createRequiredApprovalsComment,
     validateLabelsMap,
+    getRegex,
 };
 
 /** @typedef {Record<string, string[]>} InfoMap */

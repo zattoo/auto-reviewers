@@ -63,9 +63,13 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     /**
      * @param {string} createdBy
      * @param {string[]} changedFiles
+     * @param {string} level
      */
-    const getCodeOwners = async (createdBy, changedFiles) => {
+    const getCodeOwners = async (createdBy, changedFiles, level) => {
         let reviewersFiles = await utils.getMetaFiles(changedFiles, ownersFilename);
+
+        const Regex = utils.getRegex(level, PATH_PREFIX);
+        console.log(Regex);
 
         if (reviewersFiles.length <= 0) {
             reviewersFiles = [ownersFilename];
@@ -249,7 +253,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         getReviewersLevel(),
     ]);
 
-    const codeowners = await getCodeOwners(pull_request.user.login, changedFiles);
+    const codeowners = await getCodeOwners(pull_request.user.login, changedFiles, level);
     core.info(`level is: ${level}`);
 
     switch (context.eventName) {
