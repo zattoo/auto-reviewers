@@ -14,7 +14,7 @@ const getRegex = (level, pathPrefix) => {
     const combinedPath = path.join(pathPrefix, level);
 
     return globToRegExp(combinedPath, {
-        flags: "ig",
+        flags: "i",
         globstar: true,
     });
 };
