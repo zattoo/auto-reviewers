@@ -5,7 +5,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## 1.0.1 - 26.08.2021
 
-Increase the amount of results for `List reviews for a pull request` from 30 to 100
+Increased the amount of results for `List reviews for a pull request` from 30 to 100
 
 ## 1.0.0 - 18.08.2021
 
