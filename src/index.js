@@ -117,8 +117,6 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
             per_page: 100,
         }));
 
-        console.log({listReviews});
-
         const allReviewersData = listReviews.data;
 
         const latestReviews = {};
@@ -145,7 +143,6 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
      * @returns {Promise<void>}
      */
     const approvalProcess = async (codeowners, reviewers, changedFiles, shouldDismiss) => {
-        console.log(reviewers);
         const approvers = Object.keys(reviewers).filter((reviewer) => {
             return reviewers[reviewer].state === 'APPROVED';
         });
@@ -160,9 +157,6 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         const filesWhichStillNeedApproval = changedFiles.filter((file) => {
             return !allApprovedFiles.includes(file);
         });
-
-        core.info(JSON.stringify({approvers}));
-        core.info(JSON.stringify({allApprovedFiles}));
 
         if (filesWhichStillNeedApproval.length > 0) {
             core.warning("No sufficient approvals can't approve the pull-request");
