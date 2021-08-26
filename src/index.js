@@ -110,10 +110,14 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
      * @returns {Promise<Record<string, object>>}
      */
     const getReviewers = async () => {
-        const allReviewersData = (await octokit.rest.pulls.listReviews({
+        // pagination is not possible see https://github.com/octokit/rest.js/issues/33
+        const listReviews = (await octokit.rest.pulls.listReviews({
             ...repo,
             pull_number,
-        })).data;
+            per_page: 100,
+        }));
+
+        const allReviewersData = listReviews.data;
 
         const latestReviews = {};
 
@@ -153,7 +157,6 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         const filesWhichStillNeedApproval = changedFiles.filter((file) => {
             return !allApprovedFiles.includes(file);
         });
-
 
         if (filesWhichStillNeedApproval.length > 0) {
             core.warning("No sufficient approvals can't approve the pull-request");
