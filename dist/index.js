@@ -9944,13 +9944,33 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     const token = core.getInput('token', {required: true});
     const ownersFilename = core.getInput('source', {required: true});
     const ignoreFiles = core.getMultilineInput('ignore_files', {required: true});
-    const labelsMap = JSON.parse(core.getInput('labels_map', {required: false}));
+    const labelsMap = core.getInput('labels_map', {required: false});
 
     const octokit = getOctokit(token);
 
     const {repo} = context;
     const {pull_request} = context.payload;
     const pull_number = pull_request.number;
+
+    /**
+     * @returns {Record<string, string>}
+     */
+    const parseLabelsMap = () => {
+        let labelsMapObj;
+
+        try {
+            labelsMapObj = JSON.parse(labelsMap);
+        } catch (_e) {
+            return undefined;
+        }
+
+        if (!utils.validateLabelsMap(labelsMapObj)){
+            core.warning('labels_map does not have a valid structure');
+            return undefined;
+        }
+
+        return labelsMapObj;
+    };
 
     /**
      * @returns {string[]}
@@ -9994,8 +10014,6 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     const getCodeOwners = async (createdBy, changedFiles, level) => {
         let reviewersFiles = await utils.getMetaFiles(changedFiles, ownersFilename, utils.getRegex(level, PATH_PREFIX));
 
-        core.info(reviewersFiles);
-
         if (reviewersFiles.length <= 0) {
             reviewersFiles = [ownersFilename];
         }
@@ -10010,19 +10028,14 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     const getReviewersLevel = async () => {
         // no level
         const DEFAULT_LEVEL = '';
+        const labelsMapObj = parseLabelsMap();
 
-        if (!labelsMap) {
-            return DEFAULT_LEVEL;
-        }
-
-        // early exit if not a valid map
-        if (!utils.validateLabelsMap(labelsMap)){
-            core.warning('labels_map does not have a valid structure ')
+        if (!labelsMapObj) {
             return DEFAULT_LEVEL;
         }
 
         const labelsOnPR = await getLabels();
-        const labelsBelongsToAction = Object.keys(labelsMap);
+        const labelsBelongsToAction = Object.keys(labelsMapObj);
 
         const matchedLabels = labelsOnPR.filter((label) => {
             return labelsBelongsToAction.includes(label);
@@ -10031,9 +10044,9 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         if (matchedLabels.length <= 0) {
             return DEFAULT_LEVEL;
         } else if(matchedLabels.length === 1) {
-            return labelsMap[matchedLabels[0]];
+            return labelsMapObj[matchedLabels[0]];
         } else {
-            const labelsPaths = matchedLabels.map((label) => labelsMap[label]);
+            const labelsPaths = matchedLabels.map((label) => labelsMapObj[label]);
 
             return labelsPaths.reduce((currentPath, nextPath) => {
                 const relative = path.relative(nextPath, currentPath);
