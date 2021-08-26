@@ -9694,7 +9694,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         const allReviewersData = (await octokit.paginate(octokit.rest.pulls.listReviews({
             ...repo,
             pull_number,
-        }))).data;
+        })));
 
         console.log({allReviewersData});
 
