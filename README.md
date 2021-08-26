@@ -49,12 +49,12 @@ In the current example `projects/common/.labels` is the closest one so all the l
       pull_request_review:
       pull_request:
           types: [
-                  opened,
-                  ready_for_review,
-                  reopened,
-                  synchronize,
-                  labeled,
-                  unlabeled,
+              opened,
+              ready_for_review,
+              reopened,
+              synchronize,
+              labeled,
+              unlabeled,
           ]
 
   jobs:
