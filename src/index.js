@@ -115,6 +115,8 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
             pull_number,
         })).data;
 
+        console.log({allReviewersData});
+
         const latestReviews = {};
 
         allReviewersData.forEach((review) => {
@@ -139,6 +141,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
      * @returns {Promise<void>}
      */
     const approvalProcess = async (codeowners, reviewers, changedFiles, shouldDismiss) => {
+        console.log(reviewers);
         const approvers = Object.keys(reviewers).filter((reviewer) => {
             return reviewers[reviewer].state === 'APPROVED';
         });
