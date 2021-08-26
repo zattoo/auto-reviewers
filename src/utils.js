@@ -32,13 +32,13 @@ const validateLabelsMap = (labelsMap) => {
         return false;
     }
 
-    for (let label of Object.keys(labelsMap)) {
+    for (const label of Object.keys(labelsMap)) {
         if (typeof label !== 'string') {
             return false;
         }
     }
 
-    for (let path of Object.values(labelsMap)) {
+    for (const path of Object.values(labelsMap)) {
         console.log(JSON.stringify({
             path,
             type: typeof path,
