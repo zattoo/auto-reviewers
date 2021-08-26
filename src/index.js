@@ -100,6 +100,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     const getReviewersLevel = async () => {
         // no level
         const DEFAULT_LEVEL = '';
+        core.info('getting labels mapObject');
         const labelsMapObj = parseLabelsMap();
 
         if (!labelsMapObj) {
