@@ -110,10 +110,12 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
      * @returns {Promise<Record<string, object>>}
      */
     const getReviewers = async () => {
-        const allReviewersData = (await octokit.paginate(octokit.rest.pulls.listReviews({
+        const request = octokit.rest.pulls.listReviews({
             ...repo,
             pull_number,
-        })));
+        });
+
+        const allReviewersData = await octokit.paginate(request);
 
         console.log({allReviewersData});
 
