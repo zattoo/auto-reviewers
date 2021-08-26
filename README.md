@@ -1,4 +1,4 @@
-# Auto Reviewers
+# Reviewers
 
 GitHub Action to recognize and assign reviewers and codeowners
 
