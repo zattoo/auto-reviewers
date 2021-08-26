@@ -9961,6 +9961,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         try {
             labelsMapObj = JSON.parse(labelsMap);
         } catch (_e) {
+            core.info("can't validate the labels-map");
             return undefined;
         }
 
