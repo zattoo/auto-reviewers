@@ -9735,6 +9735,8 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
             return !allApprovedFiles.includes(file);
         });
 
+        core.info(JSON.stringify({approvers}));
+        core.info(JSON.stringify({allApprovedFiles}));
 
         if (filesWhichStillNeedApproval.length > 0) {
             core.warning("No sufficient approvals can't approve the pull-request");
