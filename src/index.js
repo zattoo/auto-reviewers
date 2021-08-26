@@ -49,10 +49,22 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     };
 
     /**
+     * @param {string[]} changedFiles
+     */
+    const printChangedFiles = (changedFiles) => {
+        core.startGroup('Changed Files');
+        changedFiles.forEach((file) => {
+            core.info(`- ${file}`);
+        });
+        core.endGroup();
+        // break line
+        core.info('');
+    };
+
+    /**
      * @returns {string[]}
      */
     const getChangedFiles = async () => {
-        core.startGroup('Changed Files');
         const listFilesOptions = octokit.rest.pulls.listFiles.endpoint.merge({
             ...context.repo,
             pull_number,
@@ -61,16 +73,11 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         const listFilesResponse = await octokit.paginate(listFilesOptions);
 
         const changedFiles = listFilesResponse.map((file) => {
-            core.info(`- ${file.filename}`);
-
             // @see https://docs.github.com/en/actions/reference/environment-variables
             return path.join(PATH_PREFIX, file.filename);
         });
 
-        core.endGroup();
-        // break line
-        core.info('');
-        return utils.filterChangedFiles(changedFiles, ignoreFiles)
+        return changedFiles;
     };
 
     const getLabels = async () => {
@@ -264,14 +271,16 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         getReviewersLevel(),
     ]);
 
-    const codeowners = await getCodeOwners(pull_request.user.login, changedFiles, level);
+    printChangedFiles(changedFiles);
+    const filteredChangedFiles = utils.filterChangedFiles(changedFiles, ignoreFiles);
+    const codeowners = await getCodeOwners(pull_request.user.login, filteredChangedFiles, level);
     core.info(`level is: ${level}`);
 
     switch (context.eventName) {
         case 'pull_request': {
             await Promise.all([
                 assignReviewers(codeowners, Object.keys(reviewers)),
-                approvalProcess(codeowners, reviewers, changedFiles, true),
+                approvalProcess(codeowners, reviewers, filteredChangedFiles, true),
             ]);
 
             break;
@@ -283,7 +292,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
                 context.payload.sender.login !== user  &&
                 (/approved|dismissed/).test(context.payload.review.state)
             ) {
-                await approvalProcess(codeowners, reviewers, changedFiles, true);
+                await approvalProcess(codeowners, reviewers, filteredChangedFiles, true);
             }
 
             break;
