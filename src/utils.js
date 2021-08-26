@@ -39,10 +39,6 @@ const validateLabelsMap = (labelsMap) => {
     }
 
     for (const path of Object.values(labelsMap)) {
-        console.log(JSON.stringify({
-            path,
-            type: typeof path,
-        }));
         if (typeof path !== 'string') {
             return false;
         }

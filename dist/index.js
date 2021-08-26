@@ -9588,10 +9588,6 @@ const validateLabelsMap = (labelsMap) => {
     }
 
     for (const path of Object.values(labelsMap)) {
-        console.log(JSON.stringify({
-            path,
-            type: typeof path,
-        }));
         if (typeof path !== 'string') {
             return false;
         }
@@ -9960,12 +9956,16 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
      * @returns {Record<string, string>}
      */
     const parseLabelsMap = () => {
+        if (!labelsMap) {
+            return undefined;
+        }
+
         let labelsMapObj;
 
         try {
             labelsMapObj = JSON.parse(labelsMap);
         } catch (_e) {
-            core.info("can't validate the labels-map");
+            core.warning('labels_map does not have a valid JSON structure');
             return undefined;
         }
 
@@ -10035,7 +10035,6 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     const getReviewersLevel = async () => {
         // no level
         const DEFAULT_LEVEL = '';
-        core.info('getting labels mapObject');
         const labelsMapObj = parseLabelsMap();
 
         if (!labelsMapObj) {
