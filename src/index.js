@@ -43,8 +43,6 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
             return undefined;
         }
 
-        core.info(JSON.stringify(labelsMapObj));
-
         return labelsMapObj;
     };
 
