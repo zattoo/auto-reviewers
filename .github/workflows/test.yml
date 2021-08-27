@@ -22,7 +22,6 @@ jobs:
       - run: npm ci
       - run: npm run build
 
-
   lint:
     name: Lint
     runs-on: ubuntu-latest

@@ -9494,7 +9494,7 @@ const findFiles = async (filename, directory, regex, foundFiles = []) => {
     // if no regex and we already found something just return it
     if (!regex && foundFiles.length > 0) {
         return foundFiles;
-    } else if(regex) {
+    } else if (regex) {
         const match = regex.exec(file);
         // reset regex
         regex.lastIndex = 0;
@@ -9944,7 +9944,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     const token = core.getInput('token', {required: true});
     const ownersFilename = core.getInput('source', {required: true});
     const ignoreFiles = core.getMultilineInput('ignore', {required: true});
-    const labelsMap = core.getInput('labels_map', {required: false});
+    const labelsMap = core.getInput('labels', {required: false});
 
     const octokit = getOctokit(token);
 
@@ -9965,12 +9965,12 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         try {
             labelsMapObj = JSON.parse(labelsMap);
         } catch (_e) {
-            core.warning('labels_map does not have a valid JSON structure');
+            core.warning('labels does not have a valid JSON structure');
             return undefined;
         }
 
         if (!utils.validateLabelsMap(labelsMapObj)){
-            core.warning('labels_map does not have a valid structure');
+            core.warning('labels does not have a valid structure');
             return undefined;
         }
 

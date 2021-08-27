@@ -10,7 +10,7 @@ inputs:
   token:
     description: 'GitHub token'
     required: true
-  labels_map:
+  labels:
     description: 'Record, with `label` keys and glob path values.'
     required: false
 runs:

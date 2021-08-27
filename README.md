@@ -22,7 +22,7 @@ Required. Filename which contain owners metadata to look for
 
 Optional. list of files which the action should ignore when assigning reviewers, If no other changed files except ignore ones, the action will assign root level owners
 
-### `labels_map`
+### `labels`
 
 `JSON string`
 
@@ -70,7 +70,7 @@ In the current example `projects/common/.labels` is the closest one so all the l
                     ignore: |
                       CHANGELOG.md
                       Another file
-                    labels_map: |
+                    labels: |
                         {
                           "reviewers:projects": "**/projects/*",
                           "reviewers:platform": "/"
