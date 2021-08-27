@@ -35,7 +35,7 @@ const findFiles = async (filename, directory, regex, foundFiles = []) => {
     // if no regex and we already found something just return it
     if (!regex && foundFiles.length > 0) {
         return foundFiles;
-    } else if(regex) {
+    } else if (regex) {
         const match = regex.exec(file);
         // reset regex
         regex.lastIndex = 0;

@@ -18,15 +18,15 @@ Required. Filename which contain owners metadata to look for
 
 ### `ignore_files`
 
-`multiLine string`
+`multi-line string`
 
 Optional. list of files which the action should ignore when assigning reviewers, If no other changed files except ignore ones, the action will assign root level owners
 
 ### `labels_map`
 
-`key-value pair object`
+`JSON string`
 
-Optional. a key-value object, where keys are `labels` and values are a glob of a `path` in the code. If specific label added to a Pull-request, the action will assign reviewers according to the map
+Optional. Record, with `label` keys and glob path values. If a specified label is added to a PR, the action will assign reviewers according to the map.
 
 ## Usage
 
@@ -72,7 +72,7 @@ In the current example `projects/common/.labels` is the closest one so all the l
                         Another file
                     labels_map: |
                         {
-                          "reviewers-projects": "**/projects/*",
-                          "reviewers-platform": "/"
+                          "reviewers:projects": "**/projects/*",
+                          "reviewers:platform": "/"
                         }
 ````
