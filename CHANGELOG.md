@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 Added assign reviewers using labels
 
+## 1.0.1 - 26.08.2021
+
+### Changed
+- Increased the amount of results for `List reviews for a pull request` from 30 to 100
+
+### Infrastructure
+- Renamed package to `reviewers`
+
 ## 1.0.0 - 18.08.2021
 
 Initial implementation

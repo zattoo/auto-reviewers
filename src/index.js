@@ -188,10 +188,14 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
      * @returns {Promise<Record<string, object>>}
      */
     const getReviewers = async () => {
-        const allReviewersData = (await octokit.rest.pulls.listReviews({
+        // pagination is not possible see https://github.com/octokit/rest.js/issues/33
+        const listReviews = (await octokit.rest.pulls.listReviews({
             ...repo,
             pull_number,
-        })).data;
+            per_page: 100,
+        }));
+
+        const allReviewersData = listReviews.data;
 
         const latestReviews = {};
 
