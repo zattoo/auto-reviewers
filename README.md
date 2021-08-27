@@ -16,7 +16,7 @@ Required. GitHub token
 
 Required. Filename which contain owners metadata to look for
 
-### `ignore_files`
+### `ignore`
 
 `multi-line string`
 
@@ -67,9 +67,9 @@ In the current example `projects/common/.labels` is the closest one so all the l
                 with:
                     token: ${{secrets.TOKEN}}
                     source: '.owners'
-                    ignore_files: |
-                        CHANGELOG.md
-                        Another file
+                    ignore: |
+                      CHANGELOG.md
+                      Another file
                     labels_map: |
                         {
                           "reviewers:projects": "**/projects/*",

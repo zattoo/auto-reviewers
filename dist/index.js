@@ -9621,7 +9621,7 @@ const filterChangedFiles = (changedFiles, ignoreFiles) => {
  */
 const getMetaFiles = async (changedFiles, filename, regex) => {
     const queue = changedFiles.map(async (filePath) => {
-        return findNearestFile(filename, filePath,regex);
+        return findNearestFile(filename, filePath, regex);
     });
 
     const results = await Promise.all(queue);
@@ -9943,7 +9943,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
 (async () => {
     const token = core.getInput('token', {required: true});
     const ownersFilename = core.getInput('source', {required: true});
-    const ignoreFiles = core.getMultilineInput('ignore_files', {required: true});
+    const ignoreFiles = core.getMultilineInput('ignore', {required: true});
     const labelsMap = core.getInput('labels_map', {required: false});
 
     const octokit = getOctokit(token);
