@@ -72,7 +72,7 @@ const filterChangedFiles = (changedFiles, ignoreFiles) => {
  */
 const getMetaFiles = async (changedFiles, filename, regex) => {
     const queue = changedFiles.map(async (filePath) => {
-        return findNearestFile(filename, filePath,regex);
+        return findNearestFile(filename, filePath, regex);
     });
 
     const results = await Promise.all(queue);
