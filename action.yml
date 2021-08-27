@@ -4,12 +4,15 @@ inputs:
   source:
     description: 'Filename which contain owners metadata to look for'
     required: true
-  ignore_files:
+  ignore:
     description: 'Files to be ignored when assigning reviewers'
     required: false
   token:
     description: 'GitHub token'
     required: true
+  labels:
+    description: 'Record, with `label` keys and glob path values.'
+    required: false
 runs:
   using: 'node12'
   main: 'dist/index.js'

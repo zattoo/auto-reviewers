@@ -1,7 +1,6 @@
 const {
     getOwnersMap,
     getMetaFiles,
-    getMetaInfoFromFiles,
 } = require('../src/utils');
 
 const ownersMap = {

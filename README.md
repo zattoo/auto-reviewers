@@ -16,6 +16,18 @@ Required. GitHub token
 
 Required. Filename which contain owners metadata to look for
 
+### `ignore`
+
+`multi-line string`
+
+Optional. list of files which the action should ignore when assigning reviewers, If no other changed files except ignore ones, the action will assign root level owners
+
+### `labels`
+
+`JSON string`
+
+Optional. Record, with `label` keys and glob path values. If a specified label is added to a PR, the action will assign reviewers according to the map.
+
 ## Usage
 
 ### Metadata file
@@ -31,24 +43,36 @@ In the current example `projects/common/.labels` is the closest one so all the l
 ### Workflow
 
 ````yaml
-name: Auto Reviewers
+  name: Reviewers
 
-on:
-    pull_request_review:
-    pull_request:
+  on:
+      pull_request_review:
+      pull_request:
+          types: [
+              opened,
+              ready_for_review,
+              reopened,
+              synchronize,
+              labeled,
+              unlabeled,
+          ]
 
-jobs:
-    assign-labels:
-        name: Assign labels
-        runs-on: ubuntu-latest
-        steps:
-          - uses: actions/checkout@v2
-          - uses: zattoo/auto-reviewers@v1
-            with:
-              token: ${{secrets.TOKEN}}
-              source: '.owners'
-              ignore_files: '
-                .owners
-                CHANGELOG.md
-              '
+  jobs:
+      reviewers:
+          name: Reviewers
+          runs-on: ubuntu-latest
+          steps:
+              - uses: actions/checkout@v2
+              - uses: zattoo/reviewers@levels
+                with:
+                    token: ${{secrets.TOKEN}}
+                    source: '.owners'
+                    ignore: |
+                      CHANGELOG.md
+                      Another file
+                    labels: |
+                        {
+                          "reviewers:projects": "**/projects/*",
+                          "reviewers:platform": "/"
+                        }
 ````

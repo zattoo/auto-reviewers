@@ -6036,6 +6036,143 @@ module.exports = {
 
 /***/ }),
 
+/***/ 7117:
+/***/ ((module) => {
+
+module.exports = function (glob, opts) {
+  if (typeof glob !== 'string') {
+    throw new TypeError('Expected a string');
+  }
+
+  var str = String(glob);
+
+  // The regexp we are building, as a string.
+  var reStr = "";
+
+  // Whether we are matching so called "extended" globs (like bash) and should
+  // support single character matching, matching ranges of characters, group
+  // matching, etc.
+  var extended = opts ? !!opts.extended : false;
+
+  // When globstar is _false_ (default), '/foo/*' is translated a regexp like
+  // '^\/foo\/.*$' which will match any string beginning with '/foo/'
+  // When globstar is _true_, '/foo/*' is translated to regexp like
+  // '^\/foo\/[^/]*$' which will match any string beginning with '/foo/' BUT
+  // which does not have a '/' to the right of it.
+  // E.g. with '/foo/*' these will match: '/foo/bar', '/foo/bar.txt' but
+  // these will not '/foo/bar/baz', '/foo/bar/baz.txt'
+  // Lastely, when globstar is _true_, '/foo/**' is equivelant to '/foo/*' when
+  // globstar is _false_
+  var globstar = opts ? !!opts.globstar : false;
+
+  // If we are doing extended matching, this boolean is true when we are inside
+  // a group (eg {*.html,*.js}), and false otherwise.
+  var inGroup = false;
+
+  // RegExp flags (eg "i" ) to pass in to RegExp constructor.
+  var flags = opts && typeof( opts.flags ) === "string" ? opts.flags : "";
+
+  var c;
+  for (var i = 0, len = str.length; i < len; i++) {
+    c = str[i];
+
+    switch (c) {
+    case "/":
+    case "$":
+    case "^":
+    case "+":
+    case ".":
+    case "(":
+    case ")":
+    case "=":
+    case "!":
+    case "|":
+      reStr += "\\" + c;
+      break;
+
+    case "?":
+      if (extended) {
+        reStr += ".";
+	    break;
+      }
+
+    case "[":
+    case "]":
+      if (extended) {
+        reStr += c;
+	    break;
+      }
+
+    case "{":
+      if (extended) {
+        inGroup = true;
+	    reStr += "(";
+	    break;
+      }
+
+    case "}":
+      if (extended) {
+        inGroup = false;
+	    reStr += ")";
+	    break;
+      }
+
+    case ",":
+      if (inGroup) {
+        reStr += "|";
+	    break;
+      }
+      reStr += "\\" + c;
+      break;
+
+    case "*":
+      // Move over all consecutive "*"'s.
+      // Also store the previous and next characters
+      var prevChar = str[i - 1];
+      var starCount = 1;
+      while(str[i + 1] === "*") {
+        starCount++;
+        i++;
+      }
+      var nextChar = str[i + 1];
+
+      if (!globstar) {
+        // globstar is disabled, so treat any number of "*" as one
+        reStr += ".*";
+      } else {
+        // globstar is enabled, so determine if this is a globstar segment
+        var isGlobstar = starCount > 1                      // multiple "*"'s
+          && (prevChar === "/" || prevChar === undefined)   // from the start of the segment
+          && (nextChar === "/" || nextChar === undefined)   // to the end of the segment
+
+        if (isGlobstar) {
+          // it's a globstar, so match zero or more path segments
+          reStr += "((?:[^/]*(?:\/|$))*)";
+          i++; // move over the "/"
+        } else {
+          // it's not a globstar, so only match one path segment
+          reStr += "([^/]*)";
+        }
+      }
+      break;
+
+    default:
+      reStr += c;
+    }
+  }
+
+  // When regexp 'g' flag is specified don't
+  // constrain the regular expression with ^ & $
+  if (!flags || !~flags.indexOf('g')) {
+    reStr = "^" + reStr + "$";
+  }
+
+  return new RegExp(reStr, flags);
+};
+
+
+/***/ }),
+
 /***/ 7356:
 /***/ ((module) => {
 
@@ -7083,6 +7220,152 @@ function stripBom (content) {
 }
 
 module.exports = { stringify, stripBom }
+
+
+/***/ }),
+
+/***/ 5723:
+/***/ ((module) => {
+
+/**
+ * lodash (Custom Build) <https://lodash.com/>
+ * Build: `lodash modularize exports="npm" -o ./`
+ * Copyright jQuery Foundation and other contributors <https://jquery.org/>
+ * Released under MIT license <https://lodash.com/license>
+ * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
+ * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+ */
+
+/** `Object#toString` result references. */
+var objectTag = '[object Object]';
+
+/**
+ * Checks if `value` is a host object in IE < 9.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a host object, else `false`.
+ */
+function isHostObject(value) {
+  // Many host objects are `Object` objects that can coerce to strings
+  // despite having improperly defined `toString` methods.
+  var result = false;
+  if (value != null && typeof value.toString != 'function') {
+    try {
+      result = !!(value + '');
+    } catch (e) {}
+  }
+  return result;
+}
+
+/**
+ * Creates a unary function that invokes `func` with its argument transformed.
+ *
+ * @private
+ * @param {Function} func The function to wrap.
+ * @param {Function} transform The argument transform.
+ * @returns {Function} Returns the new function.
+ */
+function overArg(func, transform) {
+  return function(arg) {
+    return func(transform(arg));
+  };
+}
+
+/** Used for built-in method references. */
+var funcProto = Function.prototype,
+    objectProto = Object.prototype;
+
+/** Used to resolve the decompiled source of functions. */
+var funcToString = funcProto.toString;
+
+/** Used to check objects for own properties. */
+var hasOwnProperty = objectProto.hasOwnProperty;
+
+/** Used to infer the `Object` constructor. */
+var objectCtorString = funcToString.call(Object);
+
+/**
+ * Used to resolve the
+ * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
+ * of values.
+ */
+var objectToString = objectProto.toString;
+
+/** Built-in value references. */
+var getPrototype = overArg(Object.getPrototypeOf, Object);
+
+/**
+ * Checks if `value` is object-like. A value is object-like if it's not `null`
+ * and has a `typeof` result of "object".
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
+ * @example
+ *
+ * _.isObjectLike({});
+ * // => true
+ *
+ * _.isObjectLike([1, 2, 3]);
+ * // => true
+ *
+ * _.isObjectLike(_.noop);
+ * // => false
+ *
+ * _.isObjectLike(null);
+ * // => false
+ */
+function isObjectLike(value) {
+  return !!value && typeof value == 'object';
+}
+
+/**
+ * Checks if `value` is a plain object, that is, an object created by the
+ * `Object` constructor or one with a `[[Prototype]]` of `null`.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.8.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a plain object, else `false`.
+ * @example
+ *
+ * function Foo() {
+ *   this.a = 1;
+ * }
+ *
+ * _.isPlainObject(new Foo);
+ * // => false
+ *
+ * _.isPlainObject([1, 2, 3]);
+ * // => false
+ *
+ * _.isPlainObject({ 'x': 0, 'y': 0 });
+ * // => true
+ *
+ * _.isPlainObject(Object.create(null));
+ * // => true
+ */
+function isPlainObject(value) {
+  if (!isObjectLike(value) ||
+      objectToString.call(value) != objectTag || isHostObject(value)) {
+    return false;
+  }
+  var proto = getPrototype(value);
+  if (proto === null) {
+    return true;
+  }
+  var Ctor = hasOwnProperty.call(proto, 'constructor') && proto.constructor;
+  return (typeof Ctor == 'function' &&
+    Ctor instanceof Ctor && funcToString.call(Ctor) == objectCtorString);
+}
+
+module.exports = isPlainObject;
 
 
 /***/ }),
@@ -9197,25 +9480,43 @@ const nextLevelUp = (directory) => {
  *
  * @param {string} filename
  * @param {string} directory
+ * @param {RegExp} regex
+ * @param {string[]} [foundFiles]
+ * @returns {string[]}
  */
-const findFile = async (filename, directory) => {
+const findFiles = async (filename, directory, regex, foundFiles = []) => {
     if (!directory) {
-        return null;
+        return foundFiles;
     }
 
     const file = path.join(directory, filename);
+
+    // if no regex and we already found something just return it
+    if (!regex && foundFiles.length > 0) {
+        return foundFiles;
+    } else if (regex) {
+        const match = regex.exec(file);
+        // reset regex
+        regex.lastIndex = 0;
+
+        // if no match and we already found something just return it
+        if (!match && foundFiles.length > 0) {
+            return foundFiles;
+        }
+    }
+
     const nextDirectory = nextLevelUp(directory);
 
     try {
         const fileExists = await fse.pathExists(file);
 
         if (fileExists) {
-            return file;
+            foundFiles.push(file);
         }
 
-        return await findFile(filename, nextDirectory);
+        return findFiles(filename, nextDirectory, regex, foundFiles);
     } catch (e) {
-        return await findFile(filename, nextDirectory);
+        return findFiles(filename, nextDirectory, regex, foundFiles);
     }
 };
 
@@ -9223,17 +9524,19 @@ const findFile = async (filename, directory) => {
  *
  * @param {string} filename
  * @param {string} root
+ * @param {RegExp} regex
+ * @returns {string[]}
  */
-const findNearestFile = async (filename, root) => {
+const findNearestFile = async (filename, root, regex) => {
     if (!filename) {
         throw new Error('filename is required');
     }
 
     if (filename.indexOf('/') !== -1 || filename === '..') {
-        throw new Error('filename must be just a filename and not a path')
+        throw new Error('filename must be just a filename and not a path');
     }
 
-    return await findFile(filename, root);
+    return findFiles(filename, root, regex);
 };
 
 module.exports = {findNearestFile}
@@ -9246,8 +9549,52 @@ module.exports = {findNearestFile}
 
 const fse = __nccwpck_require__(5630);
 const path = __nccwpck_require__(5622);
+const isPlainObject = __nccwpck_require__(5723);
+const globToRegExp = __nccwpck_require__(7117);
 
 const {findNearestFile} = __nccwpck_require__(9772);
+
+/**
+ * @param {string} level
+ * @param {string} pathPrefix
+ * @returns {RegExp}
+ */
+const getRegex = (level, pathPrefix) => {
+    if (!level) {
+        return null;
+    }
+
+    const combinedPath = path.join(pathPrefix, level);
+
+    return globToRegExp(combinedPath, {
+        flags: 'ig',
+        globstar: true,
+    });
+};
+
+/**
+ * @param {Record<string, string>}labelsMap
+ * @returns {boolean}
+ */
+const validateLabelsMap = (labelsMap) => {
+    if (!isPlainObject(labelsMap)) {
+        return false;
+    }
+
+    for (const label of Object.keys(labelsMap)) {
+        if (typeof label !== 'string') {
+            return false;
+        }
+    }
+
+    for (const path of Object.values(labelsMap)) {
+        if (typeof path !== 'string') {
+            return false;
+        }
+    }
+
+    return true;
+};
 
 /**
  * @param {string[]} changedFiles
@@ -9269,16 +9616,17 @@ const filterChangedFiles = (changedFiles, ignoreFiles) => {
 /**
  * @param {string[]} changedFiles
  * @param {string} filename
+ * @param {RegExp} regex
  * @returns {string[]}
  */
-const getMetaFiles = async (changedFiles, filename) => {
+const getMetaFiles = async (changedFiles, filename, regex) => {
     const queue = changedFiles.map(async (filePath) => {
-        return await findNearestFile(filename, filePath);
+        return findNearestFile(filename, filePath, regex);
     });
 
     const results = await Promise.all(queue);
 
-    return [...new Set(results)].filter(Boolean);
+    return [...new Set(results.flat())].filter(Boolean);
 };
 
 /**
@@ -9403,6 +9751,8 @@ module.exports = {
     filterChangedFiles,
     getOwnersMap,
     createRequiredApprovalsComment,
+    validateLabelsMap,
+    getRegex,
 };
 
 /** @typedef {Record<string, string[]>} InfoMap */
@@ -9593,7 +9943,8 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
 (async () => {
     const token = core.getInput('token', {required: true});
     const ownersFilename = core.getInput('source', {required: true});
-    const ignoreFiles = core.getMultilineInput('ignore_files', {required: true});
+    const ignoreFiles = core.getMultilineInput('ignore', {required: true});
+    const labelsMap = core.getInput('labels', {required: false});
 
     const octokit = getOctokit(token);
 
@@ -9602,10 +9953,47 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     const pull_number = pull_request.number;
 
     /**
+     * @returns {Record<string, string>}
+     */
+    const parseLabelsMap = () => {
+        if (!labelsMap) {
+            return undefined;
+        }
+
+        let labelsMapObj;
+
+        try {
+            labelsMapObj = JSON.parse(labelsMap);
+        } catch (_e) {
+            core.warning('labels does not have a valid JSON structure');
+            return undefined;
+        }
+
+        if (!utils.validateLabelsMap(labelsMapObj)){
+            core.warning('labels does not have a valid structure');
+            return undefined;
+        }
+
+        return labelsMapObj;
+    };
+
+    /**
+     * @param {string[]} changedFiles
+     */
+    const printChangedFiles = (changedFiles) => {
+        core.startGroup('Changed Files');
+        changedFiles.forEach((file) => {
+            core.info(`- ${file}`);
+        });
+        core.endGroup();
+        // break line
+        core.info('');
+    };
+
+    /**
      * @returns {string[]}
      */
     const getChangedFiles = async () => {
-        core.startGroup('Changed Files');
         const listFilesOptions = octokit.rest.pulls.listFiles.endpoint.merge({
             ...context.repo,
             pull_number,
@@ -9614,33 +10002,71 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         const listFilesResponse = await octokit.paginate(listFilesOptions);
 
         const changedFiles = listFilesResponse.map((file) => {
-            core.info(`- ${file.filename}`);
-
             // @see https://docs.github.com/en/actions/reference/environment-variables
             return path.join(PATH_PREFIX, file.filename);
         });
 
-        core.endGroup();
-        // break line
-        core.info('');
-        return utils.filterChangedFiles(changedFiles, ignoreFiles)
+        return changedFiles;
+    };
+
+    const getLabels = async () => {
+        const labels = await octokit.rest.issues.listLabelsOnIssue({
+            ...context.repo,
+            issue_number: pull_number,
+        });
+
+        return labels.data.map((label) => label.name);
     };
 
     /**
      * @param {string} createdBy
      * @param {string[]} changedFiles
+     * @param {string} level
      */
-    const getCodeOwners = async (createdBy, changedFiles) => {
-        let reviewersFiles = await utils.getMetaFiles(changedFiles, ownersFilename);
+    const getCodeOwners = async (createdBy, changedFiles, level) => {
+        let reviewersFiles = await utils.getMetaFiles(changedFiles, ownersFilename, utils.getRegex(level, PATH_PREFIX));
 
         if (reviewersFiles.length <= 0) {
             reviewersFiles = [ownersFilename];
         }
 
         const reviewersMap = await utils.getMetaInfoFromFiles(reviewersFiles);
+        return utils.getOwnersMap(reviewersMap, changedFiles, createdBy);
+    };
 
-        const ownersMap = utils.getOwnersMap(reviewersMap, changedFiles, createdBy);
-        return ownersMap;
+    /**
+     * @returns {string}
+     */
+    const getReviewersLevel = async () => {
+        // no level
+        const DEFAULT_LEVEL = '';
+        const labelsMapObj = parseLabelsMap();
+
+        if (!labelsMapObj) {
+            return DEFAULT_LEVEL;
+        }
+
+        const labelsOnPR = await getLabels();
+        const labelsBelongsToAction = Object.keys(labelsMapObj);
+
+        const matchedLabels = labelsOnPR.filter((label) => {
+            return labelsBelongsToAction.includes(label);
+        });
+
+        if (matchedLabels.length <= 0) {
+            return DEFAULT_LEVEL;
+        } else if(matchedLabels.length === 1) {
+            return labelsMapObj[matchedLabels[0]];
+        } else {
+            const labelsPaths = matchedLabels.map((label) => labelsMapObj[label]);
+
+            return labelsPaths.reduce((currentPath, nextPath) => {
+                const relative = path.relative(nextPath, currentPath);
+                const isSubDir = relative && !relative.startsWith("..") && !path.isAbsolute(relative);
+
+                return isSubDir ? nextPath : currentPath;
+            }, '**');
+        }
     };
 
     /**
@@ -9739,11 +10165,12 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
             return !allApprovedFiles.includes(file);
         });
 
+        const approvedByTheCurrentUser = reviewers[user] && reviewers[user].state === 'APPROVED';
+
         if (filesWhichStillNeedApproval.length > 0) {
             core.warning("No sufficient approvals can't approve the pull-request");
             core.info(utils.createRequiredApprovalsComment(codeowners, filesWhichStillNeedApproval, PATH_PREFIX));
 
-            const approvedByTheCurrentUser = reviewers[user] && reviewers[user].state === 'APPROVED';
 
             if (approvedByTheCurrentUser && shouldDismiss) {
                 // Dismiss
@@ -9754,13 +10181,13 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
                     message: 'No sufficient approvals',
                 });
             }
-        } else {
+        } else if(!approvedByTheCurrentUser) {
             // Approve
             await octokit.rest.pulls.createReview({
                 ...repo,
                 pull_number,
                 event: 'APPROVE',
-                body: 'All required approvals achieved, can merge now',
+                body: '',
             });
         }
     };
@@ -9769,19 +10196,24 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         changedFiles,
         reviewers,
         user,
+        level,
     ] = await Promise.all([
         getChangedFiles(),
         getReviewers(),
         getUser(),
+        getReviewersLevel(),
     ]);
 
-    const codeowners = await getCodeOwners(pull_request.user.login, changedFiles);
+    printChangedFiles(changedFiles);
+    const filteredChangedFiles = utils.filterChangedFiles(changedFiles, ignoreFiles);
+    const codeowners = await getCodeOwners(pull_request.user.login, filteredChangedFiles, level);
+    core.info(`level is: ${level}`);
 
     switch (context.eventName) {
         case 'pull_request': {
             await Promise.all([
                 assignReviewers(codeowners, Object.keys(reviewers)),
-                approvalProcess(codeowners, reviewers, changedFiles, true),
+                approvalProcess(codeowners, reviewers, filteredChangedFiles, true),
             ]);
 
             break;
@@ -9793,7 +10225,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
                 context.payload.sender.login !== user  &&
                 (/approved|dismissed/).test(context.payload.review.state)
             ) {
-                await approvalProcess(codeowners, reviewers, changedFiles, true);
+                await approvalProcess(codeowners, reviewers, filteredChangedFiles, true);
             }
 
             break;

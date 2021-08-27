@@ -1,7 +1,51 @@
 const fse = require('fs-extra');
 const path = require('path');
+const isPlainObject = require('lodash.isplainobject');
+const globToRegExp = require("glob-to-regexp");
 
 const {findNearestFile} = require('./find-nearest-file');
+
+/**
+ * @param {string} level
+ * @param {string} pathPrefix
+ * @returns {RegExp}
+ */
+const getRegex = (level, pathPrefix) => {
+    if (!level) {
+        return null;
+    }
+
+    const combinedPath = path.join(pathPrefix, level);
+
+    return globToRegExp(combinedPath, {
+        flags: 'ig',
+        globstar: true,
+    });
+};
+
+/**
+ * @param {Record<string, string>}labelsMap
+ * @returns {boolean}
+ */
+const validateLabelsMap = (labelsMap) => {
+    if (!isPlainObject(labelsMap)) {
+        return false;
+    }
+
+    for (const label of Object.keys(labelsMap)) {
+        if (typeof label !== 'string') {
+            return false;
+        }
+    }
+
+    for (const path of Object.values(labelsMap)) {
+        if (typeof path !== 'string') {
+            return false;
+        }
+    }
+
+    return true;
+};
 
 /**
  * @param {string[]} changedFiles
@@ -23,16 +67,17 @@ const filterChangedFiles = (changedFiles, ignoreFiles) => {
 /**
  * @param {string[]} changedFiles
  * @param {string} filename
+ * @param {RegExp} regex
  * @returns {string[]}
  */
-const getMetaFiles = async (changedFiles, filename) => {
+const getMetaFiles = async (changedFiles, filename, regex) => {
     const queue = changedFiles.map(async (filePath) => {
-        return await findNearestFile(filename, filePath);
+        return findNearestFile(filename, filePath, regex);
     });
 
     const results = await Promise.all(queue);
 
-    return [...new Set(results)].filter(Boolean);
+    return [...new Set(results.flat())].filter(Boolean);
 };
 
 /**
@@ -157,6 +202,8 @@ module.exports = {
     filterChangedFiles,
     getOwnersMap,
     createRequiredApprovalsComment,
+    validateLabelsMap,
+    getRegex,
 };
 
 /** @typedef {Record<string, string[]>} InfoMap */

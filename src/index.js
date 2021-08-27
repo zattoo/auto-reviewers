@@ -12,7 +12,8 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
 (async () => {
     const token = core.getInput('token', {required: true});
     const ownersFilename = core.getInput('source', {required: true});
-    const ignoreFiles = core.getMultilineInput('ignore_files', {required: true});
+    const ignoreFiles = core.getMultilineInput('ignore', {required: true});
+    const labelsMap = core.getInput('labels', {required: false});
 
     const octokit = getOctokit(token);
 
@@ -21,10 +22,47 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     const pull_number = pull_request.number;
 
     /**
+     * @returns {Record<string, string>}
+     */
+    const parseLabelsMap = () => {
+        if (!labelsMap) {
+            return undefined;
+        }
+
+        let labelsMapObj;
+
+        try {
+            labelsMapObj = JSON.parse(labelsMap);
+        } catch (_e) {
+            core.warning('labels does not have a valid JSON structure');
+            return undefined;
+        }
+
+        if (!utils.validateLabelsMap(labelsMapObj)){
+            core.warning('labels does not have a valid structure');
+            return undefined;
+        }
+
+        return labelsMapObj;
+    };
+
+    /**
+     * @param {string[]} changedFiles
+     */
+    const printChangedFiles = (changedFiles) => {
+        core.startGroup('Changed Files');
+        changedFiles.forEach((file) => {
+            core.info(`- ${file}`);
+        });
+        core.endGroup();
+        // break line
+        core.info('');
+    };
+
+    /**
      * @returns {string[]}
      */
     const getChangedFiles = async () => {
-        core.startGroup('Changed Files');
         const listFilesOptions = octokit.rest.pulls.listFiles.endpoint.merge({
             ...context.repo,
             pull_number,
@@ -33,33 +71,71 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         const listFilesResponse = await octokit.paginate(listFilesOptions);
 
         const changedFiles = listFilesResponse.map((file) => {
-            core.info(`- ${file.filename}`);
-
             // @see https://docs.github.com/en/actions/reference/environment-variables
             return path.join(PATH_PREFIX, file.filename);
         });
 
-        core.endGroup();
-        // break line
-        core.info('');
-        return utils.filterChangedFiles(changedFiles, ignoreFiles)
+        return changedFiles;
+    };
+
+    const getLabels = async () => {
+        const labels = await octokit.rest.issues.listLabelsOnIssue({
+            ...context.repo,
+            issue_number: pull_number,
+        });
+
+        return labels.data.map((label) => label.name);
     };
 
     /**
      * @param {string} createdBy
      * @param {string[]} changedFiles
+     * @param {string} level
      */
-    const getCodeOwners = async (createdBy, changedFiles) => {
-        let reviewersFiles = await utils.getMetaFiles(changedFiles, ownersFilename);
+    const getCodeOwners = async (createdBy, changedFiles, level) => {
+        let reviewersFiles = await utils.getMetaFiles(changedFiles, ownersFilename, utils.getRegex(level, PATH_PREFIX));
 
         if (reviewersFiles.length <= 0) {
             reviewersFiles = [ownersFilename];
         }
 
         const reviewersMap = await utils.getMetaInfoFromFiles(reviewersFiles);
+        return utils.getOwnersMap(reviewersMap, changedFiles, createdBy);
+    };
 
-        const ownersMap = utils.getOwnersMap(reviewersMap, changedFiles, createdBy);
-        return ownersMap;
+    /**
+     * @returns {string}
+     */
+    const getReviewersLevel = async () => {
+        // no level
+        const DEFAULT_LEVEL = '';
+        const labelsMapObj = parseLabelsMap();
+
+        if (!labelsMapObj) {
+            return DEFAULT_LEVEL;
+        }
+
+        const labelsOnPR = await getLabels();
+        const labelsBelongsToAction = Object.keys(labelsMapObj);
+
+        const matchedLabels = labelsOnPR.filter((label) => {
+            return labelsBelongsToAction.includes(label);
+        });
+
+        if (matchedLabels.length <= 0) {
+            return DEFAULT_LEVEL;
+        } else if(matchedLabels.length === 1) {
+            return labelsMapObj[matchedLabels[0]];
+        } else {
+            const labelsPaths = matchedLabels.map((label) => labelsMapObj[label]);
+
+            return labelsPaths.reduce((currentPath, nextPath) => {
+                const relative = path.relative(nextPath, currentPath);
+                const isSubDir = relative && !relative.startsWith("..") && !path.isAbsolute(relative);
+
+                return isSubDir ? nextPath : currentPath;
+            }, '**');
+        }
     };
 
     /**
@@ -158,11 +234,12 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
             return !allApprovedFiles.includes(file);
         });
 
+        const approvedByTheCurrentUser = reviewers[user] && reviewers[user].state === 'APPROVED';
+
         if (filesWhichStillNeedApproval.length > 0) {
             core.warning("No sufficient approvals can't approve the pull-request");
             core.info(utils.createRequiredApprovalsComment(codeowners, filesWhichStillNeedApproval, PATH_PREFIX));
 
-            const approvedByTheCurrentUser = reviewers[user] && reviewers[user].state === 'APPROVED';
 
             if (approvedByTheCurrentUser && shouldDismiss) {
                 // Dismiss
@@ -173,13 +250,13 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
                     message: 'No sufficient approvals',
                 });
             }
-        } else {
+        } else if(!approvedByTheCurrentUser) {
             // Approve
             await octokit.rest.pulls.createReview({
                 ...repo,
                 pull_number,
                 event: 'APPROVE',
-                body: 'All required approvals achieved, can merge now',
+                body: '',
             });
         }
     };
@@ -188,19 +265,24 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         changedFiles,
         reviewers,
         user,
+        level,
     ] = await Promise.all([
         getChangedFiles(),
         getReviewers(),
         getUser(),
+        getReviewersLevel(),
     ]);
 
-    const codeowners = await getCodeOwners(pull_request.user.login, changedFiles);
+    printChangedFiles(changedFiles);
+    const filteredChangedFiles = utils.filterChangedFiles(changedFiles, ignoreFiles);
+    const codeowners = await getCodeOwners(pull_request.user.login, filteredChangedFiles, level);
+    core.info(`level is: ${level}`);
 
     switch (context.eventName) {
         case 'pull_request': {
             await Promise.all([
                 assignReviewers(codeowners, Object.keys(reviewers)),
-                approvalProcess(codeowners, reviewers, changedFiles, true),
+                approvalProcess(codeowners, reviewers, filteredChangedFiles, true),
             ]);
 
             break;
@@ -212,7 +294,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
                 context.payload.sender.login !== user  &&
                 (/approved|dismissed/).test(context.payload.review.state)
             ) {
-                await approvalProcess(codeowners, reviewers, changedFiles, true);
+                await approvalProcess(codeowners, reviewers, filteredChangedFiles, true);
             }
 
             break;
