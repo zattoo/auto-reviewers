@@ -26921,7 +26921,7 @@ const getNextPages = (headers, route) => {
 
     console.log(links.last);
 
-    return [...range(2, links.last.page)].map((number) => {
+    return [...range(2, Number(links.last.page))].map((number) => {
         return `${route}?page=${number}`;
     });
 };
@@ -27521,6 +27521,8 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         const response = await octokit.request(route, options);
 
         const nextPages = utils.getNextPages(response.headers, route);
+
+        console.log({nextPages});
 
         let allReviewersData;
 
