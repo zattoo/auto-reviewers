@@ -193,8 +193,6 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         const options = {per_page: 3};
         const response = await octokit.request(route, options);
 
-        console.log(JSON.stringify(response));
-
         const nextPages = utils.getNextPages(response.headers, route);
 
         let allReviewersData;
@@ -207,14 +205,13 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
                 await Promise.all(
                     nextPages.map(async (page) => {
                         const {data} = (await octokit.request(page, options));
-                        console.log({page, data});
                         return data;
                     }),
                 ),
             ].flat(2);
         }
 
-        console.log(JSON.stringify(allReviewersData));
+        console.log(allReviewersData.length);
 
         const latestReviews = {};
 
