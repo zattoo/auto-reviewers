@@ -27535,7 +27535,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
             ].flat(2);
         }
 
-        console.log(allReviewersData.length);
+        console.log(JSON.stringify(allReviewersData));
 
         const latestReviews = {};
 
