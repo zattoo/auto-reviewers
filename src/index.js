@@ -190,7 +190,8 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     const getReviewers = async () => {
         const route = `GET /repos/${repo.owner}/${repo.repo}/pulls/${pull_number}/reviews`;
 
-        const response = await octokit.request(route, {per_page: 3});
+        const options = {per_page: 3};
+        const response = await octokit.request(route, options);
 
         console.log(JSON.stringify(response));
 
@@ -205,8 +206,8 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
                 response.data,
                 await Promise.all(
                     nextPages.map(async (page) => {
-                        const {data} = (await octokit.request(page));
-                        console.log(data);
+                        const {data} = (await octokit.request(page, options));
+                        console.log({page, data});
                         return data;
                     }),
                 ),
