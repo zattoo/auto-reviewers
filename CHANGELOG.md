@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Unreleased
 
 ### Fixed
-- [#8](https://github.com/zattoo/reviewers/issues/8) handle `listReviews` pagination
+- [#8](https://github.com/zattoo/reviewers/issues/8) Handle `listReviews` pagination
 
 
 ## 2.0.0 - 29.08.2021
