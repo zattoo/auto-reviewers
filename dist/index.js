@@ -26911,6 +26911,7 @@ const {findNearestFile} = __nccwpck_require__(9772);
  * @see https://docs.github.com/en/free-pro-team@latest/rest/guides/traversing-with-pagination
  * @param {ResponseHeaders} headers
  * @param {string} route
+ * @returns {string[]}
  */
 const getNextPages = (headers, route) => {
     if (!headers.link) {
@@ -27515,14 +27516,11 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
      */
     const getReviewers = async () => {
         const route = `GET /repos/${repo.owner}/${repo.repo}/pulls/${pull_number}/reviews`;
+        const options = {per_page: 100};
 
-        const options = {per_page: 3};
-        console.log(options);
         const response = await octokit.request(route, options);
 
         const nextPages = utils.getNextPages(response.headers, route);
-
-        console.log({nextPages});
 
         let allReviewersData;
 
@@ -27533,14 +27531,11 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
                 response.data,
                 await Promise.all(
                     nextPages.map(async (page) => {
-                        const {data} = (await octokit.request(page, options));
-                        return data;
+                        return (await octokit.request(page, options)).data;
                     }),
                 ),
             ].flat(2);
         }
-
-        console.log({allReviewersDataLength: allReviewersData.length});
 
         const latestReviews = {};
 
