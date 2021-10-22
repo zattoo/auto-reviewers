@@ -27517,6 +27517,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         const route = `GET /repos/${repo.owner}/${repo.repo}/pulls/${pull_number}/reviews`;
 
         const options = {per_page: 3};
+        console.log(options);
         const response = await octokit.request(route, options);
 
         const nextPages = utils.getNextPages(response.headers, route);
