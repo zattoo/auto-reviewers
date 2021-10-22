@@ -27540,7 +27540,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
             ].flat(2);
         }
 
-        console.log(allReviewersData.length);
+        console.log({allReviewersDataLength: allReviewersData.length});
 
         const latestReviews = {};
 
