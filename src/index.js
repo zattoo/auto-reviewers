@@ -196,8 +196,6 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
 
         const nextPages = utils.getNextPages(response.headers, route);
 
-        console.log({nextPages});
-
         let allReviewersData;
 
         if(!nextPages) {
@@ -207,7 +205,9 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
                 response.data,
                 await Promise.all(
                     nextPages.map(async (page) => {
-                        return (await octokit.request(page)).data;
+                        const {data} = (await octokit.request(page));
+                        console.log(data);
+                        return data;
                     }),
                 ),
             ].flat(2);
