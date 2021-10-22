@@ -196,7 +196,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
 
         const nextPages = utils.getNextPages(response.headers, route);
 
-        console.log(nextPages);
+        console.log({nextPages});
 
         let allReviewersData;
 
