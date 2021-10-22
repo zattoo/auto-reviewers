@@ -20,6 +20,9 @@ const getNextPages = (headers, route) => {
     }
 
     const links = parse(headers.link);
+
+    console.log(links.last);
+
     return [...range(2, links.last.page)].map((number) => {
         return `${route}?page=${number}`;
     });
