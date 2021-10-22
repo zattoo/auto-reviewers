@@ -13,6 +13,7 @@ const {findNearestFile} = require('./find-nearest-file');
  * @see https://docs.github.com/en/free-pro-team@latest/rest/guides/traversing-with-pagination
  * @param {ResponseHeaders} headers
  * @param {string} route
+ * @returns {string[]}
  */
 const getNextPages = (headers, route) => {
     if (!headers.link) {
