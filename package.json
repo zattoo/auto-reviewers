@@ -30,7 +30,8 @@
         "@actions/github": "5.0.0",
         "fs-extra": "10.0.0",
         "glob-to-regexp": "0.4.1",
-        "lodash.isplainobject": "4.0.6"
+        "lodash": "4.17.21",
+        "parse-link-header": "1.0.1"
     },
     "devDependencies": {
         "@types/fs-extra": "9.0.13",
