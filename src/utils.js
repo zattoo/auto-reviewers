@@ -1,9 +1,30 @@
 const fse = require('fs-extra');
 const path = require('path');
-const isPlainObject = require('lodash.isplainobject');
+const {
+    isPlainObject,
+    range,
+} = require('lodash');
 const globToRegExp = require("glob-to-regexp");
+const parse = require('parse-link-header');
 
 const {findNearestFile} = require('./find-nearest-file');
+
+/**
+ * @see https://docs.github.com/en/free-pro-team@latest/rest/guides/traversing-with-pagination
+ * @param {ResponseHeaders} headers
+ * @param {string} route
+ */
+const getNextPages = (headers, route) => {
+    if (!headers.link) {
+        return null;
+    }
+
+    const links = parse(headers.link);
+    return [...range(2, links.last.page)].map((number) => {
+        return `${route}?page=${number}`;
+    });
+};
+
 
 /**
  * @param {string} level
@@ -203,8 +224,11 @@ module.exports = {
     getOwnersMap,
     createRequiredApprovalsComment,
     validateLabelsMap,
+    getNextPages,
     getRegex,
 };
+
+/** @typedef {import('@octokit/types/dist-types/ResponseHeaders.d.ts').ResponseHeaders} ResponseHeaders */
 
 /** @typedef {Record<string, string[]>} InfoMap */
 
