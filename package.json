@@ -1,6 +1,6 @@
 {
     "name": "reviewers",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "description": "GitHub Action to recognize and assign reviewers and codeowners",
     "main": "src/index.js",
     "scripts": {
@@ -26,16 +26,17 @@
     },
     "homepage": "https://github.com/zattoo/reviewers#readme",
     "dependencies": {
-        "@actions/core": "1.5.0",
+        "@actions/core": "1.6.0",
         "@actions/github": "5.0.0",
         "fs-extra": "10.0.0",
         "glob-to-regexp": "0.4.1",
-        "lodash.isplainobject": "4.0.6"
+        "lodash": "4.17.21",
+        "parse-link-header": "1.0.1"
     },
     "devDependencies": {
-        "@types/fs-extra": "9.0.12",
-        "@vercel/ncc": "0.29.0",
-        "eslint": "7.32.0",
-        "jest": "27.0.6"
+        "@types/fs-extra": "9.0.13",
+        "@vercel/ncc": "0.31.1",
+        "eslint": "8.0.1",
+        "jest": "27.3.1"
     }
 }
