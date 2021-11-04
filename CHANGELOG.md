@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+
+### Fixed
+- [#35](https://github.com/zattoo/reviewers/issues/35) Last review per user is being evaluated even if it is just a comment
+
 ## 2.1.0 - 25.10.2021
 
 ### Fixed
