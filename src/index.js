@@ -216,6 +216,11 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
             const user = review.user.login;
             const hasUserAlready = Boolean(latestReviews[user]);
 
+            // https://docs.github.com/en/graphql/reference/enums#pullrequestreviewstate
+            if (!['APPROVED', 'CHANGES_REQUESTED', 'DISMISSED'].includes(reviewers[user].state)) {
+                return;
+            }
+
             if (!hasUserAlready) {
                 latestReviews[user] = review;
             } else if (review.submitted_at > latestReviews[user].submitted_at) {
