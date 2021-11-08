@@ -26803,6 +26803,38 @@ function extend() {
 
 /***/ }),
 
+/***/ 8145:
+/***/ ((module) => {
+
+// see https://docs.github.com/en/graphql/reference/enums#pullrequestreviewstate
+
+// A review allowing the pull request to merge.
+const APPROVED = 'APPROVED';
+
+// A review blocking the pull request from merging.
+const CHANGES_REQUESTED = 'CHANGES_REQUESTED';
+
+// An informational review.
+const COMMENTED = 'COMMENTED';
+
+// A review that has been dismissed.
+const DISMISSED = 'DISMISSED';
+
+// A review that has not yet been submitted.
+const PENDING = 'PENDING';
+
+module.exports = {
+    APPROVED,
+    CHANGES_REQUESTED,
+    COMMENTED,
+    DISMISSED,
+    PENDING,
+};
+
+
+
+/***/ }),
+
 /***/ 9772:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
@@ -27333,6 +27365,7 @@ const {
 } = __nccwpck_require__(5438);
 
 const utils = __nccwpck_require__(1608);
+const pullRequestReviewStates = __nccwpck_require__(8145);
 
 const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
 
@@ -27376,7 +27409,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     /**
      * @param {string[]} changedFiles
      */
-    const printChangedFiles = (changedFiles) => {
+    const logChangedFiles = (changedFiles) => {
         core.startGroup('Changed Files');
         changedFiles.forEach((file) => {
             core.info(`- ${file}`);
@@ -27508,13 +27541,62 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         const authInfo = await octokit.rest.users.getAuthenticated();
         return authInfo.data.login;
     }
+    //
+    // /**
+    //  * pagination is not possible see https://github.com/octokit/rest.js/issues/33
+    //  *
+    //  * @returns {Promise<Record<string, object>>}
+    //  */
+    // const getReviewers = async () => {
+    //     const route = `GET /repos/${repo.owner}/${repo.repo}/pulls/${pull_number}/reviews`;
+    //     const options = {per_page: 100};
+    //
+    //     const response = await octokit.request(route, options);
+    //
+    //     const nextPages = utils.getNextPages(response.headers, route);
+    //
+    //     let allReviewersData;
+    //
+    //     if(!nextPages) {
+    //         allReviewersData = response.data;
+    //     } else {
+    //         allReviewersData = [
+    //             response.data,
+    //             await Promise.all(
+    //                 nextPages.map(async (page) => {
+    //                     return (await octokit.request(page, options)).data;
+    //                 }),
+    //             ),
+    //         ].flat(2);
+    //     }
+    //
+    //     const latestReviews = {};
+    //
+    //     allReviewersData.forEach((review) => {
+    //         const user = review.user.login;
+    //         const hasUserAlready = Boolean(latestReviews[user]);
+    //
+    //         // https://docs.github.com/en/graphql/reference/enums#pullrequestreviewstate
+    //         if (!['APPROVED', 'CHANGES_REQUESTED', 'DISMISSED'].includes(review.state)) {
+    //             return;
+    //         }
+    //
+    //         if (!hasUserAlready) {
+    //             latestReviews[user] = review;
+    //         } else if (review.submitted_at > latestReviews[user].submitted_at) {
+    //             latestReviews[user] = review;
+    //         }
+    //     });
+    //
+    //     return latestReviews;
+    // };
 
     /**
      * pagination is not possible see https://github.com/octokit/rest.js/issues/33
      *
-     * @returns {Promise<Record<string, object>>}
+     * @returns {Promise<PullRequestReview[]>}
      */
-    const getReviewers = async () => {
+    const getReviews = async () => {
         const route = `GET /repos/${repo.owner}/${repo.repo}/pulls/${pull_number}/reviews`;
         const options = {per_page: 100};
 
@@ -27522,12 +27604,12 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
 
         const nextPages = utils.getNextPages(response.headers, route);
 
-        let allReviewersData;
+        let reviews;
 
         if(!nextPages) {
-            allReviewersData = response.data;
+            reviews = response.data;
         } else {
-            allReviewersData = [
+            reviews = [
                 response.data,
                 await Promise.all(
                     nextPages.map(async (page) => {
@@ -27537,30 +27619,56 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
             ].flat(2);
         }
 
-        const latestReviews = {};
+        return reviews;
+    };
 
-        allReviewersData.forEach((review) => {
+    /**
+     * @param {PullRequestReview[]} reviews
+     * @returns {Record<string, PullRequestReview>}
+     */
+    const getLatestReviewPerUser = (reviews) => {
+        const latestReviewPerUser = {};
+
+        reviews.forEach((review) => {
             const user = review.user.login;
-            const hasUserAlready = Boolean(latestReviews[user]);
+            const hasUserAlready = Boolean(latestReviewPerUser[user]);
 
-            // https://docs.github.com/en/graphql/reference/enums#pullrequestreviewstate
-            if (!['APPROVED', 'CHANGES_REQUESTED', 'DISMISSED'].includes(review.state)) {
+            if(![
+                pullRequestReviewStates.APPROVED,
+                pullRequestReviewStates.CHANGES_REQUESTED,
+                pullRequestReviewStates.DISMISSED,
+            ].includes(review.state)) {
                 return;
             }
 
             if (!hasUserAlready) {
-                latestReviews[user] = review;
-            } else if (review.submitted_at > latestReviews[user].submitted_at) {
-                latestReviews[user] = review;
+                latestReviewPerUser[user] = review;
+            } else if (review.submitted_at > latestReviewPerUser[user].submitted_at) {
+                latestReviewPerUser[user] = review;
             }
         });
 
-        return latestReviews;
+        return latestReviewPerUser;
+    };
+
+    /**
+     *
+     * @param {PullRequestReview[]} reviews
+     * @returns {string[]}
+     */
+    const getReviewers = (reviews) => {
+        const reviewers = new Set();
+
+        reviews.forEach((review) => {
+            reviewers.add(review.user.login);
+        });
+
+        return Array.from(reviewers);
     };
 
     /**
      * @param {OwnersMap} codeowners
-     * @param {string[]} reviewers
+     * @param {Record<string, object>} reviewers
      * @param {string[]} changedFiles
      * @param {boolean} [shouldDismiss]
      * @returns {Promise<void>}
@@ -27610,26 +27718,30 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
 
     const [
         changedFiles,
-        reviewers,
+        reviewes,
         user,
         level,
     ] = await Promise.all([
         getChangedFiles(),
-        getReviewers(),
+        getReviews(),
         getUser(),
         getReviewersLevel(),
     ]);
 
-    printChangedFiles(changedFiles);
+    logChangedFiles(changedFiles);
+
     const filteredChangedFiles = utils.filterChangedFiles(changedFiles, ignoreFiles);
     const codeowners = await getCodeOwners(pull_request.user.login, filteredChangedFiles, level);
+    const latestReviewPerUser = getLatestReviewPerUser(reviewes);
+    const reviewers = getReviewers(reviewes);
+
     core.info(`level is: ${level}`);
 
     switch (context.eventName) {
         case 'pull_request': {
             await Promise.all([
-                assignReviewers(codeowners, Object.keys(reviewers)),
-                approvalProcess(codeowners, reviewers, filteredChangedFiles, true),
+                assignReviewers(codeowners, reviewers),
+                approvalProcess(codeowners, latestReviewPerUser, filteredChangedFiles, true),
             ]);
 
             break;
@@ -27656,27 +27768,18 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     process.exit(1);
 });
 
+
 /**
- * @typedef {Object} PullRequestHandlerData
- * @prop {string[]} changedFiles
- * @prop {PullRequest} pull_request
- * @prop {ArtifactData} artifactData
- * @prop {OwnersMap} codeowners
+ * @typedef {import('./utils').OwnersMap} OwnersMap
  */
 
 /**
- * @typedef {Object} PullRequest
- * @prop {number} number
- * @prop {User} user
+ * @typedef {import('./interfaces').User} User
  */
 
 /**
- * @typedef {Object} User
- * @prop {string} login
+ * @typedef {import('./interfaces').PullRequestReview} PullRequestReview
  */
-
-
-/** @typedef {import('./utils').OwnersMap} OwnersMap */
 
 })();
 
