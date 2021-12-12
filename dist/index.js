@@ -27347,7 +27347,7 @@ const DEFAULT_COMMENT = '/reviewers show';
 
     const octokit = getOctokit(token);
 
-    core.info(JSON.stringify(Object.keys(context.payload)));
+    core.info(JSON.stringify(Object.keys(context.payload.comment)));
 
     const {repo} = context;
     const pullRequest = context.payload.pull_request || context.payload.issue;
@@ -27667,7 +27667,7 @@ const DEFAULT_COMMENT = '/reviewers show';
         case 'pull_request_review':
         case 'issue_comment': {
             const {review} = context.payload;
-            const commentReviewers = context.eventName === 'issue_comment' && context.payload.body.includes(comment);
+            const commentReviewers = context.eventName === 'issue_comment' && context.payload.comment.body.includes(comment);
 
             // We don't want to go into Infinite loop
             if (
