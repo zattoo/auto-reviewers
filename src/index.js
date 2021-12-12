@@ -20,6 +20,8 @@ const DEFAULT_COMMENT = '/reviewers show';
 
     const octokit = getOctokit(token);
 
+    core.info(JSON.stringify(Object.keys(context.payload)));
+
     const {repo} = context;
     const pullRequest = context.payload.pull_request || context.payload.issue;
 
@@ -335,15 +337,16 @@ const DEFAULT_COMMENT = '/reviewers show';
             break;
         }
 
-        case 'pull_request_review': {
+        case 'pull_request_review':
+        case 'issue_comment': {
             const {review} = context.payload;
-            const commentReviewers = review.body.includes(comment);
+            const commentReviewers = context.eventName === 'issue_comment' && context.payload.body.includes(comment);
 
             // We don't want to go into Infinite loop
             if (
                 context.payload.sender.login !== user  &&
                 (
-                    (/approved|dismissed/).test(review.state) ||
+                    (/approved|dismissed/).test(review && review.state) ||
                     commentReviewers
                 )
             ) {
@@ -351,10 +354,6 @@ const DEFAULT_COMMENT = '/reviewers show';
             }
 
             break;
-        }
-
-        case 'issue_comment': {
-            core.info(JSON.stringify(context.payload));
         }
 
         default: {
