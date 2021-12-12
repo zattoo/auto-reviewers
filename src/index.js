@@ -191,7 +191,8 @@ const DEFAULT_COMMENT = '/reviewers show';
                 issue_number: pull_number,
                 body,
             });
-        } catch {
+        } catch (e) {
+            core.info(JSON.stringify(e));
             core.setFailed('An error occurred while trying to comment on pull-request');
         }
     }
@@ -340,6 +341,7 @@ const DEFAULT_COMMENT = '/reviewers show';
         case 'pull_request_review':
         case 'issue_comment': {
             const {review} = context.payload;
+
             const commentReviewers = context.eventName === 'issue_comment' && context.payload.comment.body.includes(comment);
 
             // We don't want to go into Infinite loop
