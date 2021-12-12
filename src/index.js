@@ -19,9 +19,6 @@ const DEFAULT_COMMENT = '/reviewers show';
     const comment = core.getInput('comment', {required: false}) || DEFAULT_COMMENT;
 
     const octokit = getOctokit(token);
-
-    core.info(JSON.stringify(context));
-
     const {repo} = context;
     const pullRequest = context.payload.pull_request || context.payload.issue;
 
@@ -191,8 +188,7 @@ const DEFAULT_COMMENT = '/reviewers show';
                 comment_id: context.payload.comment.id,
                 body: `${context.payload.comment.body}\n\n${body}`,
             });
-        } catch (e) {
-            core.info(JSON.stringify(e));
+        } catch {
             core.setFailed('An error occurred while trying to comment on pull-request');
         }
     }

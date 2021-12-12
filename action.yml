@@ -14,7 +14,7 @@ inputs:
     description: 'Record, with `label` keys and glob path values.'
     required: false
   comment:
-    description: 'Comment body to trigger commenting required reviewers.'
+    description: 'Comment body to trigger adding required reviewers to the comment. Default: `/reviewers show`'
     required: false
 runs:
   using: 'node12'

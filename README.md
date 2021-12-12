@@ -32,7 +32,8 @@ Optional. Record, with `label` keys and glob path values. If a specified label i
 
 `string`
 
-Optional. Comment body to trigger commenting required reviewers. Default: `/reviewers show`
+Optional. Comment body to trigger adding required reviewers to the comment. Default: `/reviewers show`
+The workflow need to be committed to the main branch before it would be possible to trigger this feature
 
 ## Usage
 
@@ -52,6 +53,8 @@ In the current example `projects/common/.labels` is the closest one so all the l
   name: Reviewers
 
   on:
+      issue_comment:
+          types: [created]
       pull_request_review:
       pull_request:
           types: [
@@ -81,4 +84,5 @@ In the current example `projects/common/.labels` is the closest one so all the l
                           "reviewers:projects": "**/projects/*",
                           "reviewers:platform": "/"
                         }
+                    comment: 'show me reviewers'
 ````
