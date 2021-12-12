@@ -186,7 +186,7 @@ const DEFAULT_COMMENT = '/reviewers show';
      */
     const createComment = async (body) => {
         try {
-            await context.issues.createComment({
+            await octokit.rest.issues.createComment({
                 ...repo,
                 issue_number: pull_number,
                 body,
