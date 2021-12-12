@@ -20,7 +20,7 @@ const DEFAULT_COMMENT = '/reviewers show';
 
     const octokit = getOctokit(token);
 
-    core.info(JSON.stringify(Object.keys(context)));
+    core.info(JSON.stringify(context));
 
     const {repo} = context;
     const pullRequest = context.payload.pull_request || context.payload.issue;
