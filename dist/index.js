@@ -27515,7 +27515,7 @@ const DEFAULT_COMMENT = '/reviewers show';
                 comment_id: context.payload.comment.id,
                 body: `${context.payload.comment.body}\n\n${body}`,
             });
-        } catch {
+        } catch (_e) {
             core.setFailed('An error occurred while trying to comment on pull-request');
         }
     }
