@@ -28,6 +28,12 @@ Optional. list of files which the action should ignore when assigning reviewers,
 
 Optional. Record, with `label` keys and glob path values. If a specified label is added to a PR, the action will assign reviewers according to the map.
 
+### `comment`
+
+`string`
+
+Optional. Comment body to trigger commenting required reviewers. Default: `/reviewers show`
+
 ## Usage
 
 ### Metadata file

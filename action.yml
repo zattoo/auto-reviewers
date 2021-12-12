@@ -13,6 +13,9 @@ inputs:
   labels:
     description: 'Record, with `label` keys and glob path values.'
     required: false
+  comment:
+    description: 'Comment body to trigger commenting required reviewers.'
+    required: false
 runs:
   using: 'node12'
   main: 'dist/index.js'

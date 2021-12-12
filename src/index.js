@@ -9,11 +9,14 @@ const utils = require('./utils');
 
 const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
 
+const DEFAULT_COMMENT = '/reviewers show';
+
 (async () => {
     const token = core.getInput('token', {required: true});
     const ownersFilename = core.getInput('source', {required: true});
     const ignoreFiles = core.getMultilineInput('ignore', {required: true});
     const labelsMap = core.getInput('labels', {required: false});
+    const comment = core.getInput('comment', {required: false}) || DEFAULT_COMMENT;
 
     const octokit = getOctokit(token);
 
@@ -175,6 +178,21 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     };
 
     /**
+     * @param {string} body
+     */
+    const createComment = async (body) => {
+        try {
+            await context.issues.createComment({
+                ...repo,
+                issue_number: pull_number,
+                body,
+            });
+        } catch {
+            core.setFailed('An error occurred while trying to comment on pull-request');
+        }
+    }
+
+    /**
      * @returns {Promise<string>}
      */
     const getUser = async () => {
@@ -235,10 +253,10 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
      * @param {OwnersMap} codeowners
      * @param {string[]} reviewers
      * @param {string[]} changedFiles
-     * @param {boolean} [shouldDismiss]
+     * @param {boolean} [commentReviewers]
      * @returns {Promise<void>}
      */
-    const approvalProcess = async (codeowners, reviewers, changedFiles, shouldDismiss) => {
+    const approvalProcess = async (codeowners, reviewers, changedFiles, commentReviewers = false) => {
         const approvers = Object.keys(reviewers).filter((reviewer) => {
             return reviewers[reviewer].state === 'APPROVED';
         });
@@ -257,11 +275,12 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         const approvedByTheCurrentUser = reviewers[user] && reviewers[user].state === 'APPROVED';
 
         if (filesWhichStillNeedApproval.length > 0) {
+            const requiredApprovalsComment = utils.createRequiredApprovalsComment(codeowners, filesWhichStillNeedApproval, PATH_PREFIX);
+
             core.warning("No sufficient approvals can't approve the pull-request");
-            core.info(utils.createRequiredApprovalsComment(codeowners, filesWhichStillNeedApproval, PATH_PREFIX));
+            core.info(requiredApprovalsComment);
 
-
-            if (approvedByTheCurrentUser && shouldDismiss) {
+            if (approvedByTheCurrentUser) {
                 // Dismiss
                 await octokit.rest.pulls.dismissReview({
                     ...repo,
@@ -270,6 +289,11 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
                     message: 'No sufficient approvals',
                 });
             }
+            
+            if (commentReviewers) {
+                await createComment(requiredApprovalsComment);
+            }
+
         } else if(!approvedByTheCurrentUser) {
             // Approve
             await octokit.rest.pulls.createReview({
@@ -302,19 +326,25 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         case 'pull_request': {
             await Promise.all([
                 assignReviewers(codeowners, Object.keys(reviewers)),
-                approvalProcess(codeowners, reviewers, filteredChangedFiles, true),
+                approvalProcess(codeowners, reviewers, filteredChangedFiles),
             ]);
 
             break;
         }
 
         case 'pull_request_review': {
+            const {review} = context.payload;
+            const commentReviewers = review.body.includes(comment);
+
             // We don't want to go into Infinite loop
             if (
                 context.payload.sender.login !== user  &&
-                (/approved|dismissed/).test(context.payload.review.state)
+                (
+                    (/approved|dismissed/).test(review.state) ||
+                    commentReviewers
+                )
             ) {
-                await approvalProcess(codeowners, reviewers, filteredChangedFiles, true);
+                await approvalProcess(codeowners, reviewers, filteredChangedFiles, commentReviewers);
             }
 
             break;
