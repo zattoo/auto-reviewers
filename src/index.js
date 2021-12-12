@@ -22,8 +22,12 @@ const DEFAULT_COMMENT = '/reviewers show';
 
     const {repo} = context;
     core.info(JSON.stringify(context.payload.issue));
-    const {pull_request} = context.payload;
-    const pull_number = pull_request.number;
+    const pullRequest = context.payload.pull_request || context.payload.issue;
+
+    const pull_number = pullRequest.number;
+    const createdBy = pullRequest.user.login;
+
+    core.info(pull_number, createdBy);
 
     /**
      * @returns {Record<string, string>}
@@ -320,7 +324,7 @@ const DEFAULT_COMMENT = '/reviewers show';
 
     printChangedFiles(changedFiles);
     const filteredChangedFiles = utils.filterChangedFiles(changedFiles, ignoreFiles);
-    const codeowners = await getCodeOwners(pull_request.user.login, filteredChangedFiles, level);
+    const codeowners = await getCodeOwners(createdBy, filteredChangedFiles, level);
     core.info(`level is: ${level}`);
 
     switch (context.eventName) {
