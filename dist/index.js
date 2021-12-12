@@ -27677,7 +27677,7 @@ const DEFAULT_COMMENT = '/reviewers show';
             break;
         }
 
-        case 'pull_request_review_comment': {
+        case 'issue_comment': {
             core.info(JSON.stringify(context.payload));
         }
 
