@@ -27510,12 +27510,13 @@ const DEFAULT_COMMENT = '/reviewers show';
 
     /**
      * @param {string} body
+     * @param {string} id
      */
-    const createComment = async (body) => {
+    const updateComment = async (body, id) => {
         try {
-            await octokit.rest.issues.createComment({
+            await octokit.rest.issues.updateComment({
                 ...repo,
-                issue_number: pull_number,
+                comment_id: id,
                 body,
             });
         } catch (e) {
@@ -27623,7 +27624,7 @@ const DEFAULT_COMMENT = '/reviewers show';
             }
 
             if (commentReviewers) {
-                await createComment(requiredApprovalsComment);
+                await updateComment(requiredApprovalsComment);
             }
 
         } else if(!approvedByTheCurrentUser) {
