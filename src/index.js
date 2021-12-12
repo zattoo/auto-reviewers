@@ -21,13 +21,10 @@ const DEFAULT_COMMENT = '/reviewers show';
     const octokit = getOctokit(token);
 
     const {repo} = context;
-    core.info(JSON.stringify(context.payload.issue));
     const pullRequest = context.payload.pull_request || context.payload.issue;
 
     const pull_number = pullRequest.number;
     const createdBy = pullRequest.user.login;
-
-    core.info(JSON.stringify({pull_number, createdBy}));
 
     /**
      * @returns {Record<string, string>}
@@ -327,6 +324,7 @@ const DEFAULT_COMMENT = '/reviewers show';
     const codeowners = await getCodeOwners(createdBy, filteredChangedFiles, level);
     core.info(`level is: ${level}`);
 
+    core.info(`event name: ${context.eventName}`);
     switch (context.eventName) {
         case 'pull_request': {
             await Promise.all([
