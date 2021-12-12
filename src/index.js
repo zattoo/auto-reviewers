@@ -27,7 +27,7 @@ const DEFAULT_COMMENT = '/reviewers show';
     const pull_number = pullRequest.number;
     const createdBy = pullRequest.user.login;
 
-    core.info(pull_number, createdBy);
+    core.info(JSON.stringify({pull_number, createdBy}));
 
     /**
      * @returns {Record<string, string>}
