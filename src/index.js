@@ -189,7 +189,7 @@ const DEFAULT_COMMENT = '/reviewers show';
             await octokit.rest.issues.updateComment({
                 ...repo,
                 comment_id: context.payload.comment.id,
-                body: `${comment}\n\n${body}`,
+                body: `${context.payload.comment.body}\n\n${body}`,
             });
         } catch (e) {
             core.info(JSON.stringify(e));
