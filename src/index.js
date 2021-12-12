@@ -289,7 +289,7 @@ const DEFAULT_COMMENT = '/reviewers show';
                     message: 'No sufficient approvals',
                 });
             }
-            
+
             if (commentReviewers) {
                 await createComment(requiredApprovalsComment);
             }
@@ -348,6 +348,10 @@ const DEFAULT_COMMENT = '/reviewers show';
             }
 
             break;
+        }
+
+        case 'pull_request_review_comment': {
+            core.info(JSON.stringify(context.payload));
         }
 
         default: {
