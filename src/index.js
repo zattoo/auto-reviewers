@@ -310,6 +310,17 @@ const DEFAULT_COMMENT = '/reviewers show';
         }
     };
 
+    /**
+     * @returns {boolean}
+     */
+    const shallCommentReviewers = () => {
+        return (
+            context.payload.action === 'created' &&
+            context.eventName === 'issue_comment' &&
+            context.payload.comment.body.includes(comment)
+        );
+    }
+
     const [
         changedFiles,
         reviewers,
@@ -323,11 +334,12 @@ const DEFAULT_COMMENT = '/reviewers show';
     ]);
 
     printChangedFiles(changedFiles);
+
     const filteredChangedFiles = utils.filterChangedFiles(changedFiles, ignoreFiles);
     const codeowners = await getCodeOwners(createdBy, filteredChangedFiles, level);
+
     core.info(`level is: ${level}`);
 
-    core.info(`event name: ${context.eventName}`);
     switch (context.eventName) {
         case 'pull_request': {
             await Promise.all([
@@ -342,7 +354,7 @@ const DEFAULT_COMMENT = '/reviewers show';
         case 'issue_comment': {
             const {review} = context.payload;
 
-            const commentReviewers = context.eventName === 'issue_comment' && context.payload.comment.body.includes(comment);
+            const commentReviewers = shallCommentReviewers();
 
             // We don't want to go into Infinite loop
             if (
