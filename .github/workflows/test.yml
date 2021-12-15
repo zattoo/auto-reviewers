@@ -6,14 +6,6 @@ on:
       - main
 
 jobs:
-  units:
-    name: Units
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - run: npm ci
-    - run: npm test
-
   build:
     name: Build
     runs-on: ubuntu-latest
