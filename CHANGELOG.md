@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## 3.0.0 - Unreleased
 
 ### Changed
-- [breaking-changes] Architecture of assigning reviewers, preventing drilldown
+- [breaking-changes] Architecture of assigning reviewers, preventing propgation
 
 ## 2.1.1 - 05.11.2021
 
