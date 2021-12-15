@@ -516,8 +516,8 @@ class OidcClient {
             const res = yield httpclient
                 .getJson(id_token_url)
                 .catch(error => {
-                throw new Error(`Failed to get ID Token. \n
-        Error Code : ${error.statusCode}\n
+                throw new Error(`Failed to get ID Token. \n 
+        Error Code : ${error.statusCode}\n 
         Error Message: ${error.result.message}`);
             });
             const id_token = (_a = res.result) === null || _a === void 0 ? void 0 : _a.value;
@@ -26378,7 +26378,7 @@ function parseLink(link) {
 
     var info = parts
       .reduce(createObjects, {});
-
+    
     info = xtend(qry, info);
     info.url = linkUrl;
     return info;
@@ -27475,7 +27475,7 @@ module.exports = require("zlib");
 /************************************************************************/
 /******/ 	// The module cache
 /******/ 	var __webpack_module_cache__ = {};
-/******/
+/******/ 	
 /******/ 	// The require function
 /******/ 	function __nccwpck_require__(moduleId) {
 /******/ 		// Check if module is in cache
@@ -27489,7 +27489,7 @@ module.exports = require("zlib");
 /******/ 			loaded: false,
 /******/ 			exports: {}
 /******/ 		};
-/******/
+/******/ 	
 /******/ 		// Execute the module function
 /******/ 		var threw = true;
 /******/ 		try {
@@ -27498,14 +27498,14 @@ module.exports = require("zlib");
 /******/ 		} finally {
 /******/ 			if(threw) delete __webpack_module_cache__[moduleId];
 /******/ 		}
-/******/
+/******/ 	
 /******/ 		// Flag the module as loaded
 /******/ 		module.loaded = true;
-/******/
+/******/ 	
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
-/******/
+/******/ 	
 /************************************************************************/
 /******/ 	/* webpack/runtime/node module decorator */
 /******/ 	(() => {
@@ -27515,11 +27515,11 @@ module.exports = require("zlib");
 /******/ 			return module;
 /******/ 		};
 /******/ 	})();
-/******/
+/******/ 	
 /******/ 	/* webpack/runtime/compat */
-/******/
+/******/ 	
 /******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";
-/******/
+/******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
@@ -27694,7 +27694,11 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
             });
         }
 
+        console.log({requestedReviewers, reviewers});
+
         requestedReviewers = [...new Set([...requestedReviewers, ...reviewers])];
+
+        console.log({requestedReviewers});
 
         const reviewersToAdd = codeowners.filter((reviewer) => !requestedReviewers.includes(reviewer));
 
@@ -27791,6 +27795,8 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     const filteredChangedFiles = utils.filterChangedFiles(changedFiles, ignoreFiles);
     const ownersMap = await utils.createOwnersMap(changedFiles, ownersFilename, utils.getRegex(level, PATH_PREFIX));
     const codeowners = await utils.getOwners(ownersMap, ownersFilename, pull_request.user.login);
+    console.log({codeowners});
+    console.log({ownersMap});
 
     core.info(`level is: ${level}`);
 
