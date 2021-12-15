@@ -20,7 +20,7 @@ const createOwnersFileMap = async (changedFiles, filename, regex) => {
                 ownersFileMap[ownerFile] = [];
             }
 
-            ownersFileMap[ownerFile].push(filename);
+            ownersFileMap[ownerFile].push(filePath);
         });
     });
 
@@ -50,7 +50,7 @@ const createOwnersMap = async (changedFiles, filename, regex) => {
 
     const files = await Promise.all(fileQueue);
 
-    console.log({files});
+    console.log(JSON.stringify(files));
 
     const map = files.reduce((result, info) => {
         changedFiles.forEach((changedFile) => {
