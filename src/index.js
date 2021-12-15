@@ -168,7 +168,9 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
             });
         }
 
-        requestedReviewers = [...new Set([requestedReviewers, reviewers].flat())];
+        console.log({requestedReviewers, reviewers});
+
+        requestedReviewers = [...new Set([...requestedReviewers, ...reviewers])];
 
         console.log({requestedReviewers});
 

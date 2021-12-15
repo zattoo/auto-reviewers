@@ -13,8 +13,6 @@ const createOwnersFileMap = async (changedFiles, filename, regex) => {
     const ownersFilesQueue = changedFiles.map(async (filePath) => {
         const ownerFiles = await findNearestFiles(filename, filePath, regex);
 
-        console.log(ownerFiles, filePath);
-
         ownerFiles.forEach((ownerFile) => {
             if (!ownersFileMap[ownerFile]) {
                 ownersFileMap[ownerFile] = [];
@@ -37,7 +35,6 @@ const createOwnersFileMap = async (changedFiles, filename, regex) => {
  */
 const createOwnersMap = async (changedFiles, filename, regex) => {
     const ownersFileMap = await createOwnersFileMap(changedFiles, filename, regex);
-    console.log({ownersFileMap});
 
     const fileQueue = Object.entries(ownersFileMap).map(async ([ownersFile, changedFilesList]) => {
         const ownersData = await readFile(ownersFile);
@@ -49,8 +46,6 @@ const createOwnersMap = async (changedFiles, filename, regex) => {
     });
 
     const files = await Promise.all(fileQueue);
-
-    console.log(JSON.stringify(files));
 
     const map = files.reduce((result, info) => {
         info.changedFilesList.forEach((changedFile) => {
