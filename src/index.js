@@ -5,7 +5,7 @@ const {
     getOctokit,
 } = require('@actions/github');
 
-const utils = require('utils');
+const utils = require('./utils');
 const {ReviewStates} = require('./enums');
 
 const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
