@@ -26936,6 +26936,7 @@ const createOwnersFileMap = async (changedFiles, filename, regex) => {
  */
 const createOwnersMap = async (changedFiles, filename, regex) => {
     const ownersFileMap = await createOwnersFileMap(changedFiles, filename, regex);
+    console.log({ownersFileMap});
 
     const fileQueue = Object.entries(ownersFileMap).map( async([ownersFile, changedFilesList]) => {
         const ownersData = await readFile(ownersFile);
@@ -26947,6 +26948,8 @@ const createOwnersMap = async (changedFiles, filename, regex) => {
     });
 
     const files = await Promise.all(fileQueue);
+
+    console.log({files});
 
     const map = files.reduce((result, info) => {
         changedFiles.forEach((changedFile) => {
@@ -27302,7 +27305,7 @@ const readFile = async (path) => {
     }
 
     try {
-        return (await fse.readFile(path, 'utf8')).split('\n');
+        return (await fse.readFile(path, 'utf8')).split('\n').filter(Boolean);
     } catch (e) {
         return Promise.reject(`path: ${path} errored while reading data: ${e}`);
     }

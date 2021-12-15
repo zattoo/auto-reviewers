@@ -37,6 +37,7 @@ const createOwnersFileMap = async (changedFiles, filename, regex) => {
  */
 const createOwnersMap = async (changedFiles, filename, regex) => {
     const ownersFileMap = await createOwnersFileMap(changedFiles, filename, regex);
+    console.log({ownersFileMap});
 
     const fileQueue = Object.entries(ownersFileMap).map( async([ownersFile, changedFilesList]) => {
         const ownersData = await readFile(ownersFile);
@@ -48,6 +49,8 @@ const createOwnersMap = async (changedFiles, filename, regex) => {
     });
 
     const files = await Promise.all(fileQueue);
+
+    console.log({files});
 
     const map = files.reduce((result, info) => {
         changedFiles.forEach((changedFile) => {

@@ -10,7 +10,7 @@ const readFile = async (path) => {
     }
 
     try {
-        return (await fse.readFile(path, 'utf8')).split('\n');
+        return (await fse.readFile(path, 'utf8')).split('\n').filter(Boolean);
     } catch (e) {
         return Promise.reject(`path: ${path} errored while reading data: ${e}`);
     }
