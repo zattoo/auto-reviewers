@@ -26912,6 +26912,8 @@ const createOwnersFileMap = async (changedFiles, filename, regex) => {
     const ownersFilesQueue = changedFiles.map(async (filePath) => {
         const ownerFiles = await findNearestFiles(filename, filePath, regex);
 
+        console.log(ownerFiles, filePath);
+
         ownerFiles.forEach((ownerFile) => {
             if (!ownersFileMap[ownerFile]) {
                 ownersFileMap[ownerFile] = [];
@@ -27217,6 +27219,7 @@ const getOwners = async (ownersMap, filename, createdBy) => {
     }
 
     owners.filter((owner) => {
+        console.log(owner, createdBy);
         return owner !== createdBy;
     });
 
@@ -27791,6 +27794,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     const latestUserReviewMap = utils.getLatestUserReviewMap(listReviews);
     const filteredChangedFiles = utils.filterChangedFiles(changedFiles, ignoreFiles);
     const ownersMap = await utils.createOwnersMap(changedFiles, ownersFilename, utils.getRegex(level, PATH_PREFIX));
+    console.log(pull_request.user.login);
     const codeowners = await utils.getOwners(ownersMap, ownersFilename, pull_request.user.login);
 
     core.info(`level is: ${level}`);

@@ -13,6 +13,8 @@ const createOwnersFileMap = async (changedFiles, filename, regex) => {
     const ownersFilesQueue = changedFiles.map(async (filePath) => {
         const ownerFiles = await findNearestFiles(filename, filePath, regex);
 
+        console.log(ownerFiles, filePath);
+
         ownerFiles.forEach((ownerFile) => {
             if (!ownersFileMap[ownerFile]) {
                 ownersFileMap[ownerFile] = [];

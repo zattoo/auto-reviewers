@@ -263,6 +263,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     const latestUserReviewMap = utils.getLatestUserReviewMap(listReviews);
     const filteredChangedFiles = utils.filterChangedFiles(changedFiles, ignoreFiles);
     const ownersMap = await utils.createOwnersMap(changedFiles, ownersFilename, utils.getRegex(level, PATH_PREFIX));
+    console.log(pull_request.user.login);
     const codeowners = await utils.getOwners(ownersMap, ownersFilename, pull_request.user.login);
 
     core.info(`level is: ${level}`);
