@@ -27209,7 +27209,7 @@ const getOwners = async (ownersMap, filename, createdBy) => {
     let owners = [];
 
     Object.values(ownersMap).forEach((fileOwners) => {
-        owners.add(...fileOwners);
+        owners.push(...fileOwners);
     });
 
     if (owners.length === 0) {
