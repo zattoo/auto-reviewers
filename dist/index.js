@@ -27694,11 +27694,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
             });
         }
 
-        console.log({requestedReviewers, reviewers});
-
         requestedReviewers = [...new Set([...requestedReviewers, ...reviewers])];
-
-        console.log({requestedReviewers});
 
         const reviewersToAdd = codeowners.filter((reviewer) => !requestedReviewers.includes(reviewer));
 
@@ -27795,8 +27791,6 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     const filteredChangedFiles = utils.filterChangedFiles(changedFiles, ignoreFiles);
     const ownersMap = await utils.createOwnersMap(changedFiles, ownersFilename, utils.getRegex(level, PATH_PREFIX));
     const codeowners = await utils.getOwners(ownersMap, ownersFilename, pull_request.user.login);
-    console.log({codeowners});
-    console.log({ownersMap});
 
     core.info(`level is: ${level}`);
 
