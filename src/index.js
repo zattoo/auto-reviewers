@@ -170,7 +170,10 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
 
         requestedReviewers = [...new Set([requestedReviewers, reviewers].flat())];
 
+        console.log({requestedReviewers});
+
         const reviewersToAdd = codeowners.filter((reviewer) => !requestedReviewers.includes(reviewer));
+
 
         if (reviewersToAdd.length > 0) {
             await octokit.rest.pulls.requestReviewers({
@@ -263,8 +266,9 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     const latestUserReviewMap = utils.getLatestUserReviewMap(listReviews);
     const filteredChangedFiles = utils.filterChangedFiles(changedFiles, ignoreFiles);
     const ownersMap = await utils.createOwnersMap(changedFiles, ownersFilename, utils.getRegex(level, PATH_PREFIX));
-    console.log(pull_request.user.login);
     const codeowners = await utils.getOwners(ownersMap, ownersFilename, pull_request.user.login);
+    console.log({codeowners});
+    console.log({ownersMap});
 
     core.info(`level is: ${level}`);
 

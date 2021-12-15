@@ -18,7 +18,6 @@ const getOwners = async (ownersMap, filename, createdBy) => {
     }
 
     owners.filter((owner) => {
-        console.log(owner, createdBy);
         return owner !== createdBy;
     });
 
