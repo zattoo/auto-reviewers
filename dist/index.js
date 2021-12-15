@@ -27216,11 +27216,9 @@ const getOwners = async (ownersMap, filename, createdBy) => {
         owners = await readFile(filename);
     }
 
-    owners.filter((owner) => {
+    return [...new Set(owners.filter((owner) => {
         return owner !== createdBy;
-    });
-
-    return [...new Set(owners)];
+    }))];
 };
 
 module.exports = {getOwners};
