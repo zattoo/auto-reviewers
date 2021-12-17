@@ -53,7 +53,7 @@ const createOwnersMap = async (changedFiles, filename, regex) => {
                 result[changedFile] = [];
             }
 
-            result[changedFile].push(...info.owners);
+            result[changedFile] = [...new Set([...result[changedFile], ...info.owners])];
         });
 
         return result;

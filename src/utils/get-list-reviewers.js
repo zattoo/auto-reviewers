@@ -1,7 +1,7 @@
 /**
  * Returns list of users from reviews
  *
- * @param {$Reviewers.GitHub.ListReviews} reviews
+ * @param {$Reviewers.GitHub.Review[]} reviews
  * @returns {string[]}
  */
 const getListReviewers = (reviews) => {

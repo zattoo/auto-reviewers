@@ -26952,7 +26952,7 @@ const createOwnersMap = async (changedFiles, filename, regex) => {
                 result[changedFile] = [];
             }
 
-            result[changedFile].push(...info.owners);
+            result[changedFile] = [...new Set([...result[changedFile], ...info.owners])];
         });
 
         return result;
@@ -27111,7 +27111,7 @@ const {ReviewStates} = __nccwpck_require__(1987);
 /**
  * Returns list of last reviews decision per user
  *
- * @param {$Reviewers.GitHub.ListReviews} reviews
+ * @param {$Reviewers.GitHub.Review[]} reviews
  * @returns {$Reviewers.LatestUserReviewMap}
  */
 const getLatestUserReviewMap = (reviews) => {
@@ -27150,7 +27150,7 @@ module.exports = {getLatestUserReviewMap};
 /**
  * Returns list of users from reviews
  *
- * @param {$Reviewers.GitHub.ListReviews} reviews
+ * @param {$Reviewers.GitHub.Review[]} reviews
  * @returns {string[]}
  */
 const getListReviewers = (reviews) => {
@@ -27200,25 +27200,38 @@ module.exports = {getNextPages};
 const {readFile} = __nccwpck_require__(8452);
 
 /**
+ *
+ * @param {string[]} owners
+ * @param {string} creator
+ * @returns {string[]}
+ */
+const filterCreator = (owners, creator) => {
+    return owners.filter((owner) => {
+        return owner !== creator;
+    });
+};
+
+/**
  * @param {$Reviewers.OwnersMap} ownersMap
  * @param {string} filename
- * @param {string} createdBy
+ * @param {string} creator
  * @returns {Promise<string[]>}
  */
-const getOwners = async (ownersMap, filename, createdBy) => {
+const getOwners = async (ownersMap, filename, creator) => {
     let owners = [];
 
     Object.values(ownersMap).forEach((fileOwners) => {
         owners.push(...fileOwners);
     });
 
+    owners = [...new Set(filterCreator(owners, creator))];
+
     if (owners.length === 0) {
-        owners = await readFile(filename);
+        owners = (filterCreator((await readFile(filename)), creator));
     }
 
-    return [...new Set(owners.filter((owner) => {
-        return owner !== createdBy;
-    }))];
+    return owners;
+
 };
 
 module.exports = {getOwners};
@@ -27581,7 +27594,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     }
 
     /**
-     * @returns {$Reviewers.GitHub.ListReviews}
+     * @returns {$Reviewers.GitHub.Review[]}
      */
     const getListReviews = async () => {
         const route = `GET /repos/${repo.owner}/${repo.repo}/pulls/${pull_number}/reviews`;
@@ -27790,7 +27803,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     const latestUserReviewMap = utils.getLatestUserReviewMap(listReviews);
     const filteredChangedFiles = utils.filterChangedFiles(changedFiles, ignoreFiles);
     const ownersMap = await utils.createOwnersMap(changedFiles, ownersFilename, utils.getRegex(level, PATH_PREFIX));
-    const codeowners = await utils.getOwners(ownersMap, ownersFilename, pull_request.user.login);
+    const codeowners = await utils.getOwners(ownersMap, path.join(PATH_PREFIX, ownersFilename), pull_request.user.login);
 
     core.info(`level is: ${level}`);
 

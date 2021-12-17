@@ -55,7 +55,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     }
 
     /**
-     * @returns {$Reviewers.GitHub.ListReviews}
+     * @returns {$Reviewers.GitHub.Review[]}
      */
     const getListReviews = async () => {
         const route = `GET /repos/${repo.owner}/${repo.repo}/pulls/${pull_number}/reviews`;
@@ -264,7 +264,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     const latestUserReviewMap = utils.getLatestUserReviewMap(listReviews);
     const filteredChangedFiles = utils.filterChangedFiles(changedFiles, ignoreFiles);
     const ownersMap = await utils.createOwnersMap(changedFiles, ownersFilename, utils.getRegex(level, PATH_PREFIX));
-    const codeowners = await utils.getOwners(ownersMap, ownersFilename, pull_request.user.login);
+    const codeowners = await utils.getOwners(ownersMap, path.join(PATH_PREFIX, ownersFilename), pull_request.user.login);
 
     core.info(`level is: ${level}`);
 

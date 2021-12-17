@@ -3,7 +3,7 @@ const {ReviewStates} = require('../enums');
 /**
  * Returns list of last reviews decision per user
  *
- * @param {$Reviewers.GitHub.ListReviews} reviews
+ * @param {$Reviewers.GitHub.Review[]} reviews
  * @returns {$Reviewers.LatestUserReviewMap}
  */
 const getLatestUserReviewMap = (reviews) => {
