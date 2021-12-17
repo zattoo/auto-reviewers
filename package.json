@@ -31,7 +31,7 @@
         "fs-extra": "10.0.0",
         "glob-to-regexp": "0.4.1",
         "lodash": "4.17.21",
-        "parse-link-header": "1.0.1"
+        "parse-link-header": "2.0.0"
     },
     "devDependencies": {
         "@octokit/types": "6.34.0",
