@@ -27,7 +27,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.issue = exports.issueCommand = void 0;
-const os = __importStar(__nccwpck_require__(2087));
+const os = __importStar(__nccwpck_require__(2037));
 const utils_1 = __nccwpck_require__(5278);
 /**
  * Commands
@@ -138,8 +138,8 @@ exports.getIDToken = exports.getState = exports.saveState = exports.group = expo
 const command_1 = __nccwpck_require__(7351);
 const file_command_1 = __nccwpck_require__(717);
 const utils_1 = __nccwpck_require__(5278);
-const os = __importStar(__nccwpck_require__(2087));
-const path = __importStar(__nccwpck_require__(5622));
+const os = __importStar(__nccwpck_require__(2037));
+const path = __importStar(__nccwpck_require__(1017));
 const oidc_utils_1 = __nccwpck_require__(8041);
 /**
  * The code to exit an action
@@ -448,8 +448,8 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.issueCommand = void 0;
 // We use any as a valid input type
 /* eslint-disable @typescript-eslint/no-explicit-any */
-const fs = __importStar(__nccwpck_require__(5747));
-const os = __importStar(__nccwpck_require__(2087));
+const fs = __importStar(__nccwpck_require__(7147));
+const os = __importStar(__nccwpck_require__(2037));
 const utils_1 = __nccwpck_require__(5278);
 function issueCommand(command, message) {
     const filePath = process.env[`GITHUB_${command}`];
@@ -606,8 +606,8 @@ exports.toCommandProperties = toCommandProperties;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Context = void 0;
-const fs_1 = __nccwpck_require__(5747);
-const os_1 = __nccwpck_require__(2087);
+const fs_1 = __nccwpck_require__(7147);
+const os_1 = __nccwpck_require__(2037);
 class Context {
     /**
      * Hydrate the context from the environment
@@ -886,8 +886,8 @@ exports.PersonalAccessTokenCredentialHandler = PersonalAccessTokenCredentialHand
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const http = __nccwpck_require__(8605);
-const https = __nccwpck_require__(7211);
+const http = __nccwpck_require__(3685);
+const https = __nccwpck_require__(5687);
 const pm = __nccwpck_require__(6443);
 let tunnel;
 var HttpCodes;
@@ -4231,9 +4231,9 @@ exports.Deprecation = Deprecation;
 
 
 const fs = __nccwpck_require__(7758)
-const path = __nccwpck_require__(5622)
-const mkdirsSync = __nccwpck_require__(2915).mkdirsSync
-const utimesMillisSync = __nccwpck_require__(2548).utimesMillisSync
+const path = __nccwpck_require__(1017)
+const mkdirsSync = (__nccwpck_require__(8605).mkdirsSync)
+const utimesMillisSync = (__nccwpck_require__(2548).utimesMillisSync)
 const stat = __nccwpck_require__(3901)
 
 function copySync (src, dest, opts) {
@@ -4418,10 +4418,10 @@ module.exports = {
 
 
 const fs = __nccwpck_require__(7758)
-const path = __nccwpck_require__(5622)
-const mkdirs = __nccwpck_require__(2915).mkdirs
-const pathExists = __nccwpck_require__(3835).pathExists
-const utimesMillis = __nccwpck_require__(2548).utimesMillis
+const path = __nccwpck_require__(1017)
+const mkdirs = (__nccwpck_require__(8605).mkdirs)
+const pathExists = (__nccwpck_require__(3835).pathExists)
+const utimesMillis = (__nccwpck_require__(2548).utimesMillis)
 const stat = __nccwpck_require__(3901)
 
 function copy (src, dest, opts, cb) {
@@ -4657,7 +4657,7 @@ module.exports = copy
 "use strict";
 
 
-const u = __nccwpck_require__(9046).fromCallback
+const u = (__nccwpck_require__(9046).fromCallback)
 module.exports = {
   copy: u(__nccwpck_require__(8834))
 }
@@ -4671,10 +4671,10 @@ module.exports = {
 "use strict";
 
 
-const u = __nccwpck_require__(9046).fromPromise
+const u = (__nccwpck_require__(9046).fromPromise)
 const fs = __nccwpck_require__(1176)
-const path = __nccwpck_require__(5622)
-const mkdir = __nccwpck_require__(2915)
+const path = __nccwpck_require__(1017)
+const mkdir = __nccwpck_require__(8605)
 const remove = __nccwpck_require__(7357)
 
 const emptyDir = u(async function emptyDir (dir) {
@@ -4718,10 +4718,10 @@ module.exports = {
 "use strict";
 
 
-const u = __nccwpck_require__(9046).fromCallback
-const path = __nccwpck_require__(5622)
+const u = (__nccwpck_require__(9046).fromCallback)
+const path = __nccwpck_require__(1017)
 const fs = __nccwpck_require__(7758)
-const mkdir = __nccwpck_require__(2915)
+const mkdir = __nccwpck_require__(8605)
 
 function createFile (file, callback) {
   function makeFile () {
@@ -4826,11 +4826,11 @@ module.exports = {
 "use strict";
 
 
-const u = __nccwpck_require__(9046).fromCallback
-const path = __nccwpck_require__(5622)
+const u = (__nccwpck_require__(9046).fromCallback)
+const path = __nccwpck_require__(1017)
 const fs = __nccwpck_require__(7758)
-const mkdir = __nccwpck_require__(2915)
-const pathExists = __nccwpck_require__(3835).pathExists
+const mkdir = __nccwpck_require__(8605)
+const pathExists = (__nccwpck_require__(3835).pathExists)
 const { areIdentical } = __nccwpck_require__(3901)
 
 function createLink (srcpath, dstpath, callback) {
@@ -4898,9 +4898,9 @@ module.exports = {
 "use strict";
 
 
-const path = __nccwpck_require__(5622)
+const path = __nccwpck_require__(1017)
 const fs = __nccwpck_require__(7758)
-const pathExists = __nccwpck_require__(3835).pathExists
+const pathExists = (__nccwpck_require__(3835).pathExists)
 
 /**
  * Function that returns two types of paths, one relative to symlink, and one
@@ -5044,10 +5044,10 @@ module.exports = {
 "use strict";
 
 
-const u = __nccwpck_require__(9046).fromCallback
-const path = __nccwpck_require__(5622)
+const u = (__nccwpck_require__(9046).fromCallback)
+const path = __nccwpck_require__(1017)
 const fs = __nccwpck_require__(1176)
-const _mkdirs = __nccwpck_require__(2915)
+const _mkdirs = __nccwpck_require__(8605)
 const mkdirs = _mkdirs.mkdirs
 const mkdirsSync = _mkdirs.mkdirsSync
 
@@ -5059,7 +5059,7 @@ const _symlinkType = __nccwpck_require__(8254)
 const symlinkType = _symlinkType.symlinkType
 const symlinkTypeSync = _symlinkType.symlinkTypeSync
 
-const pathExists = __nccwpck_require__(3835).pathExists
+const pathExists = (__nccwpck_require__(3835).pathExists)
 
 const { areIdentical } = __nccwpck_require__(3901)
 
@@ -5135,7 +5135,7 @@ module.exports = {
 
 // This is adapted from https://github.com/normalize/mz
 // Copyright (c) 2014-2016 Jonathan Ong me@jongleberry.com and Contributors
-const u = __nccwpck_require__(9046).fromCallback
+const u = (__nccwpck_require__(9046).fromCallback)
 const fs = __nccwpck_require__(7758)
 
 const api = [
@@ -5270,7 +5270,7 @@ module.exports = {
   ...__nccwpck_require__(6970),
   ...__nccwpck_require__(55),
   ...__nccwpck_require__(213),
-  ...__nccwpck_require__(2915),
+  ...__nccwpck_require__(8605),
   ...__nccwpck_require__(9665),
   ...__nccwpck_require__(1497),
   ...__nccwpck_require__(6570),
@@ -5287,7 +5287,7 @@ module.exports = {
 "use strict";
 
 
-const u = __nccwpck_require__(9046).fromPromise
+const u = (__nccwpck_require__(9046).fromPromise)
 const jsonFile = __nccwpck_require__(8970)
 
 jsonFile.outputJson = u(__nccwpck_require__(531))
@@ -5364,12 +5364,12 @@ module.exports = outputJson
 
 /***/ }),
 
-/***/ 2915:
+/***/ 8605:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
-const u = __nccwpck_require__(9046).fromPromise
+const u = (__nccwpck_require__(9046).fromPromise)
 const { makeDir: _makeDir, makeDirSync } = __nccwpck_require__(2751)
 const makeDir = u(_makeDir)
 
@@ -5431,7 +5431,7 @@ module.exports.makeDirSync = (dir, options) => {
 // The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-const path = __nccwpck_require__(5622)
+const path = __nccwpck_require__(1017)
 
 // https://github.com/nodejs/node/issues/8987
 // https://github.com/libuv/libuv/pull/1088
@@ -5470,10 +5470,10 @@ module.exports = {
 
 
 const fs = __nccwpck_require__(7758)
-const path = __nccwpck_require__(5622)
-const copySync = __nccwpck_require__(1135).copySync
-const removeSync = __nccwpck_require__(7357).removeSync
-const mkdirpSync = __nccwpck_require__(2915).mkdirpSync
+const path = __nccwpck_require__(1017)
+const copySync = (__nccwpck_require__(1135).copySync)
+const removeSync = (__nccwpck_require__(7357).removeSync)
+const mkdirpSync = (__nccwpck_require__(8605).mkdirpSync)
 const stat = __nccwpck_require__(3901)
 
 function moveSync (src, dest, opts) {
@@ -5531,7 +5531,7 @@ module.exports = moveSync
 "use strict";
 
 
-const u = __nccwpck_require__(9046).fromCallback
+const u = (__nccwpck_require__(9046).fromCallback)
 module.exports = {
   move: u(__nccwpck_require__(2231))
 }
@@ -5546,11 +5546,11 @@ module.exports = {
 
 
 const fs = __nccwpck_require__(7758)
-const path = __nccwpck_require__(5622)
-const copy = __nccwpck_require__(1335).copy
-const remove = __nccwpck_require__(7357).remove
-const mkdirp = __nccwpck_require__(2915).mkdirp
-const pathExists = __nccwpck_require__(3835).pathExists
+const path = __nccwpck_require__(1017)
+const copy = (__nccwpck_require__(1335).copy)
+const remove = (__nccwpck_require__(7357).remove)
+const mkdirp = (__nccwpck_require__(8605).mkdirp)
+const pathExists = (__nccwpck_require__(3835).pathExists)
 const stat = __nccwpck_require__(3901)
 
 function move (src, dest, opts, cb) {
@@ -5626,11 +5626,11 @@ module.exports = move
 "use strict";
 
 
-const u = __nccwpck_require__(9046).fromCallback
+const u = (__nccwpck_require__(9046).fromCallback)
 const fs = __nccwpck_require__(7758)
-const path = __nccwpck_require__(5622)
-const mkdir = __nccwpck_require__(2915)
-const pathExists = __nccwpck_require__(3835).pathExists
+const path = __nccwpck_require__(1017)
+const mkdir = __nccwpck_require__(8605)
+const pathExists = (__nccwpck_require__(3835).pathExists)
 
 function outputFile (file, data, encoding, callback) {
   if (typeof encoding === 'function') {
@@ -5673,7 +5673,7 @@ module.exports = {
 
 "use strict";
 
-const u = __nccwpck_require__(9046).fromPromise
+const u = (__nccwpck_require__(9046).fromPromise)
 const fs = __nccwpck_require__(1176)
 
 function pathExists (path) {
@@ -5695,8 +5695,8 @@ module.exports = {
 
 
 const fs = __nccwpck_require__(7758)
-const u = __nccwpck_require__(9046).fromCallback
-const rimraf = __nccwpck_require__(7247)
+const u = (__nccwpck_require__(9046).fromCallback)
+const rimraf = __nccwpck_require__(8761)
 
 function remove (path, callback) {
   // Node 14.14.0+
@@ -5718,15 +5718,15 @@ module.exports = {
 
 /***/ }),
 
-/***/ 7247:
+/***/ 8761:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
 
 const fs = __nccwpck_require__(7758)
-const path = __nccwpck_require__(5622)
-const assert = __nccwpck_require__(2357)
+const path = __nccwpck_require__(1017)
+const assert = __nccwpck_require__(9491)
 
 const isWindows = (process.platform === 'win32')
 
@@ -6035,8 +6035,8 @@ rimraf.sync = rimrafSync
 
 
 const fs = __nccwpck_require__(1176)
-const path = __nccwpck_require__(5622)
-const util = __nccwpck_require__(1669)
+const path = __nccwpck_require__(1017)
+const util = __nccwpck_require__(3837)
 
 function getStats (src, dest, opts) {
   const statFunc = opts.dereference
@@ -6395,12 +6395,12 @@ function clone (obj) {
 /***/ 7758:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var fs = __nccwpck_require__(5747)
+var fs = __nccwpck_require__(7147)
 var polyfills = __nccwpck_require__(263)
 var legacy = __nccwpck_require__(3086)
 var clone = __nccwpck_require__(7356)
 
-var util = __nccwpck_require__(1669)
+var util = __nccwpck_require__(3837)
 
 /* istanbul ignore next - node 0.x polyfill */
 var gracefulQueue
@@ -6481,7 +6481,7 @@ if (!fs[gracefulQueue]) {
   if (/\bgfs4\b/i.test(process.env.NODE_DEBUG || '')) {
     process.on('exit', function() {
       debug(fs[gracefulQueue])
-      __nccwpck_require__(2357).equal(fs[gracefulQueue].length, 0)
+      __nccwpck_require__(9491).equal(fs[gracefulQueue].length, 0)
     })
   }
 }
@@ -6775,7 +6775,7 @@ function retry () {
 /***/ 3086:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var Stream = __nccwpck_require__(2413).Stream
+var Stream = (__nccwpck_require__(2781).Stream)
 
 module.exports = legacy
 
@@ -6900,7 +6900,7 @@ function legacy (fs) {
 /***/ 263:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var constants = __nccwpck_require__(7619)
+var constants = __nccwpck_require__(2057)
 
 var origCwd = process.cwd
 var cwd = null
@@ -7303,7 +7303,7 @@ let _fs
 try {
   _fs = __nccwpck_require__(7758)
 } catch (_) {
-  _fs = __nccwpck_require__(5747)
+  _fs = __nccwpck_require__(7147)
 }
 const universalify = __nccwpck_require__(9046)
 const { stringify, stripBom } = __nccwpck_require__(5902)
@@ -24639,11 +24639,11 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
-var Stream = _interopDefault(__nccwpck_require__(2413));
-var http = _interopDefault(__nccwpck_require__(8605));
-var Url = _interopDefault(__nccwpck_require__(8835));
-var https = _interopDefault(__nccwpck_require__(7211));
-var zlib = _interopDefault(__nccwpck_require__(8761));
+var Stream = _interopDefault(__nccwpck_require__(2781));
+var http = _interopDefault(__nccwpck_require__(3685));
+var Url = _interopDefault(__nccwpck_require__(7310));
+var https = _interopDefault(__nccwpck_require__(5687));
+var zlib = _interopDefault(__nccwpck_require__(9796));
 
 // Based on https://github.com/tmpvar/jsdom/blob/aa85b2abf07766ff7bf5c1f6daafb3726f2f2db5/lib/jsdom/living/blob.js
 
@@ -24794,7 +24794,7 @@ FetchError.prototype.name = 'FetchError';
 
 let convert;
 try {
-	convert = __nccwpck_require__(2877).convert;
+	convert = (__nccwpck_require__(2877).convert);
 } catch (e) {}
 
 const INTERNALS = Symbol('Body internals');
@@ -26277,7 +26277,7 @@ fetch.Promise = global.Promise;
 
 module.exports = exports = fetch;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.default = exports;
+exports["default"] = exports;
 exports.Headers = Headers;
 exports.Request = Request;
 exports.Response = Response;
@@ -26341,8 +26341,8 @@ function onceStrict (fn) {
 "use strict";
 
 
-var qs = __nccwpck_require__(1191)
-  , url = __nccwpck_require__(8835)
+var qs = __nccwpck_require__(3477)
+  , url = __nccwpck_require__(7310)
   , xtend = __nccwpck_require__(1208);
 
 function hasRel(x) {
@@ -26413,13 +26413,13 @@ module.exports = __nccwpck_require__(4219);
 "use strict";
 
 
-var net = __nccwpck_require__(1631);
-var tls = __nccwpck_require__(4016);
-var http = __nccwpck_require__(8605);
-var https = __nccwpck_require__(7211);
-var events = __nccwpck_require__(8614);
-var assert = __nccwpck_require__(2357);
-var util = __nccwpck_require__(1669);
+var net = __nccwpck_require__(1808);
+var tls = __nccwpck_require__(4404);
+var http = __nccwpck_require__(3685);
+var https = __nccwpck_require__(5687);
+var events = __nccwpck_require__(2361);
+var assert = __nccwpck_require__(9491);
+var util = __nccwpck_require__(3837);
 
 
 exports.httpOverHttp = httpOverHttp;
@@ -26803,10 +26803,220 @@ function extend() {
 
 /***/ }),
 
-/***/ 9772:
+/***/ 388:
+/***/ ((module) => {
+
+// https://docs.github.com/en/graphql/reference/enums#commentauthorassociation
+// A comment author association with repository.
+
+// Author has been invited to collaborate on the repository.
+const COLLABORATOR = 'COLLABORATOR';
+
+// Author has previously committed to the repository.
+const CONTRIBUTOR = 'CONTRIBUTOR';
+
+// Author has not previously committed to GitHub.
+const FIRST_TIMER = 'FIRST_TIMER';
+
+// Author has not previously committed to the repository.
+const FIRST_TIME_CONTRIBUTOR = 'FIRST_TIME_CONTRIBUTOR';
+
+// Author is a placeholder for an unclaimed user.
+const MANNEQUIN = 'MANNEQUIN';
+
+// Author is a member of the organization that owns the repository.
+const MEMBER = 'MEMBER';
+
+// Author has no association with the repository.
+const NONE = 'NONE';
+
+// Author is the owner of the repository.
+const OWNER = 'OWNER';
+
+module.exports = {
+    COLLABORATOR,
+    CONTRIBUTOR,
+    FIRST_TIMER,
+    FIRST_TIME_CONTRIBUTOR,
+    MANNEQUIN,
+    MEMBER,
+    NONE,
+    OWNER,
+};
+
+
+/***/ }),
+
+/***/ 1987:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const path = __nccwpck_require__(5622);
+const AuthorAssociations = __nccwpck_require__(388);
+const ReviewStates = __nccwpck_require__(5869);
+
+
+module.exports = {
+    AuthorAssociations,
+    ReviewStates,
+};
+
+
+/***/ }),
+
+/***/ 5869:
+/***/ ((module) => {
+
+// see https://docs.github.com/en/graphql/reference/enums#pullrequestreviewstate
+// The possible states of a pull request review.
+
+// A review allowing the pull request to merge.
+const APPROVED = 'APPROVED';
+
+// A review blocking the pull request from merging.
+const CHANGES_REQUESTED = 'CHANGES_REQUESTED';
+
+// An informational review.
+const COMMENTED = 'COMMENTED';
+
+// A review that has been dismissed.
+const DISMISSED = 'DISMISSED';
+
+// A review that has not yet been submitted.
+const PENDING = 'PENDING';
+
+module.exports = {
+    APPROVED,
+    CHANGES_REQUESTED,
+    COMMENTED,
+    DISMISSED,
+    PENDING,
+};
+
+
+/***/ }),
+
+/***/ 7561:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+const {findNearestFiles} = __nccwpck_require__(5765);
+const {readFile} = __nccwpck_require__(8452);
+
+/**
+ * @param {string[]} changedFiles
+ * @param {string} filename
+ * @param {RegExp} regex
+ * @returns {Promise<Record<string, string[]>>}
+ */
+const createOwnersFileMap = async (changedFiles, filename, regex) => {
+    const ownersFileMap = {};
+
+    const ownersFilesQueue = changedFiles.map(async (filePath) => {
+        const ownerFiles = await findNearestFiles(filename, filePath, regex);
+
+        ownerFiles.forEach((ownerFile) => {
+            if (!ownersFileMap[ownerFile]) {
+                ownersFileMap[ownerFile] = [];
+            }
+
+            ownersFileMap[ownerFile].push(filePath);
+        });
+    });
+
+    await Promise.all(ownersFilesQueue);
+
+    return ownersFileMap;
+};
+
+/**
+ * @param {string[]} changedFiles
+ * @param {string} filename
+ * @param {RegExp} regex
+ * @returns {Promise<$Reviewers.OwnersMap>}
+ */
+const createOwnersMap = async (changedFiles, filename, regex) => {
+    const ownersFileMap = await createOwnersFileMap(changedFiles, filename, regex);
+
+    const fileQueue = Object.entries(ownersFileMap).map(async ([ownersFile, changedFilesList]) => {
+        const ownersData = await readFile(ownersFile);
+
+        return {
+            owners: ownersData,
+            changedFilesList,
+        };
+    });
+
+    const files = await Promise.all(fileQueue);
+
+    const map = files.reduce((result, info) => {
+        info.changedFilesList.forEach((changedFile) => {
+            if (!result[changedFile]) {
+                result[changedFile] = [];
+            }
+
+            result[changedFile] = [...new Set([...result[changedFile], ...info.owners])];
+        });
+
+        return result;
+    }, {});
+
+    return map;
+};
+
+module.exports = {createOwnersMap};
+
+
+/***/ }),
+
+/***/ 2953:
+/***/ ((module) => {
+
+/**
+ * @param {$Reviewers.OwnersMap} ownersMap
+ * @param {string[]} filesWhichRequireApproval
+ * @param {string} pathPrefix
+ */
+const createRequiredApprovalsComment = (ownersMap, filesWhichRequireApproval, pathPrefix) => {
+    const filesMap = filesWhichRequireApproval.map((file) => {
+        return `- ${file.substr(pathPrefix.length + 1)} (${ownersMap[file].join(', ')})`;
+    }).join('\n');
+
+    return (`Approval is still required for ${filesWhichRequireApproval.length} files\n${filesMap}`);
+};
+
+module.exports = {createRequiredApprovalsComment};
+
+
+
+/***/ }),
+
+/***/ 3730:
+/***/ ((module) => {
+
+/**
+ * @param {string[]} changedFiles
+ * @param {string[]} ignoreFiles
+ * @returns {string[]}
+ */
+const filterChangedFiles = (changedFiles, ignoreFiles) => {
+    const filteredFiles = changedFiles.filter((file) => {
+        return !ignoreFiles.includes(file.split('/').pop());
+    });
+
+    if (filteredFiles.length) {
+        return filteredFiles;
+    }
+
+    return changedFiles;
+};
+
+module.exports = {filterChangedFiles};
+
+
+/***/ }),
+
+/***/ 5765:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+const path = __nccwpck_require__(1017);
 const fse = __nccwpck_require__(5630);
 
 /**
@@ -26874,9 +27084,9 @@ const findFiles = async (filename, directory, regex, foundFiles = []) => {
  * @param {string} filename
  * @param {string} root
  * @param {RegExp} regex
- * @returns {string[]}
+ * @returns {Promise<string[]>}
  */
-const findNearestFile = async (filename, root, regex) => {
+const findNearestFiles = async (filename, root, regex) => {
     if (!filename) {
         throw new Error('filename is required');
     }
@@ -26888,28 +27098,81 @@ const findNearestFile = async (filename, root, regex) => {
     return findFiles(filename, root, regex);
 };
 
-module.exports = {findNearestFile}
+module.exports = {findNearestFiles}
 
 
 /***/ }),
 
-/***/ 1608:
+/***/ 8731:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const fse = __nccwpck_require__(5630);
-const path = __nccwpck_require__(5622);
-const {
-    isPlainObject,
-    range,
-} = __nccwpck_require__(250);
-const globToRegExp = __nccwpck_require__(7117);
-const parse = __nccwpck_require__(1940);
+const {ReviewStates} = __nccwpck_require__(1987);
 
-const {findNearestFile} = __nccwpck_require__(9772);
+/**
+ * Returns list of last reviews decision per user
+ *
+ * @param {$Reviewers.GitHub.Review[]} reviews
+ * @returns {$Reviewers.LatestUserReviewMap}
+ */
+const getLatestUserReviewMap = (reviews) => {
+    /** @type {$Reviewers.LatestUserReviewMap} */
+    const listLatestReviewDecision = {};
+
+    const meaningfulStates = [ReviewStates.APPROVED, ReviewStates.CHANGES_REQUESTED, ReviewStates.DISMISSED];
+
+    reviews.forEach((review) => {
+        const user = review.user.login;
+        const hasUserAlready = Boolean(listLatestReviewDecision[user]);
+
+        // https://docs.github.com/en/graphql/reference/enums#pullrequestreviewstate
+        if (!meaningfulStates.includes(review.state)) {
+            return;
+        }
+
+        if (!hasUserAlready) {
+            listLatestReviewDecision[user] = review;
+        } else if (review.submitted_at > listLatestReviewDecision[user].submitted_at) {
+            listLatestReviewDecision[user] = review;
+        }
+    });
+
+    return listLatestReviewDecision;
+};
+
+module.exports = {getLatestUserReviewMap};
+
+
+/***/ }),
+
+/***/ 8107:
+/***/ ((module) => {
+
+/**
+ * Returns list of users from reviews
+ *
+ * @param {$Reviewers.GitHub.Review[]} reviews
+ * @returns {string[]}
+ */
+const getListReviewers = (reviews) => {
+    return [...new Set(reviews.map((review) => {
+        return review.user.login;
+    }))];
+};
+
+module.exports = {getListReviewers};
+
+
+/***/ }),
+
+/***/ 9183:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+const {range} = __nccwpck_require__(250);
+const parse = __nccwpck_require__(1940);
 
 /**
  * @see https://docs.github.com/en/free-pro-team@latest/rest/guides/traversing-with-pagination
- * @param {ResponseHeaders} headers
+ * @param {$Reviewers.GitHub.ResponseHeaders} headers
  * @param {string} route
  * @returns {string[]}
  */
@@ -26926,6 +27189,61 @@ const getNextPages = (headers, route) => {
     });
 };
 
+module.exports = {getNextPages};
+
+
+/***/ }),
+
+/***/ 6425:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+const {readFile} = __nccwpck_require__(8452);
+
+/**
+ *
+ * @param {string[]} owners
+ * @param {string} creator
+ * @returns {string[]}
+ */
+const filterCreator = (owners, creator) => {
+    return owners.filter((owner) => {
+        return owner !== creator;
+    });
+};
+
+/**
+ * @param {$Reviewers.OwnersMap} ownersMap
+ * @param {string} filename
+ * @param {string} creator
+ * @returns {Promise<string[]>}
+ */
+const getOwners = async (ownersMap, filename, creator) => {
+    let owners = [];
+
+    Object.values(ownersMap).forEach((fileOwners) => {
+        owners.push(...fileOwners);
+    });
+
+    owners = [...new Set(filterCreator(owners, creator))];
+
+    if (owners.length === 0) {
+        owners = (filterCreator((await readFile(filename)), creator));
+    }
+
+    return owners;
+
+};
+
+module.exports = {getOwners};
+
+
+/***/ }),
+
+/***/ 1298:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+const path = __nccwpck_require__(1017);
+const globToRegExp = __nccwpck_require__(7117);
 
 /**
  * @param {string} level
@@ -26944,6 +27262,70 @@ const getRegex = (level, pathPrefix) => {
         globstar: true,
     });
 };
+
+module.exports = {getRegex};
+
+
+/***/ }),
+
+/***/ 2070:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+const {createRequiredApprovalsComment} = __nccwpck_require__(2953);
+const {createOwnersMap} = __nccwpck_require__(7561);
+const {filterChangedFiles} = __nccwpck_require__(3730);
+const {getListReviewers} = __nccwpck_require__(8107);
+const {getLatestUserReviewMap} = __nccwpck_require__(8731);
+const {getNextPages} = __nccwpck_require__(9183);
+const {getRegex} = __nccwpck_require__(1298);
+const {getOwners} = __nccwpck_require__(6425);
+const {validateLabelsMap} = __nccwpck_require__(3848);
+
+module.exports = {
+    createRequiredApprovalsComment,
+    createOwnersMap,
+    filterChangedFiles,
+    getListReviewers,
+    getLatestUserReviewMap,
+    getNextPages,
+    getOwners,
+    getRegex,
+    validateLabelsMap,
+};
+
+
+/***/ }),
+
+/***/ 8452:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+const fse = __nccwpck_require__(5630);
+
+/**
+ * @param path
+ * @returns {Promise<string[]>}
+ */
+const readFile = async (path) => {
+    if (!path) {
+        return Promise.resolve('');
+    }
+
+    try {
+        return (await fse.readFile(path, 'utf8')).split('\n').filter(Boolean);
+    } catch (e) {
+        return Promise.reject(`path: ${path} errored while reading data: ${e}`);
+    }
+};
+
+module.exports = {readFile};
+
+
+/***/ }),
+
+/***/ 3848:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+const {isPlainObject} = __nccwpck_require__(250);
 
 /**
  * @param {Record<string, string>}labelsMap
@@ -26969,177 +27351,7 @@ const validateLabelsMap = (labelsMap) => {
     return true;
 };
 
-/**
- * @param {string[]} changedFiles
- * @param {string[]} ignoreFiles
- * @returns {string[]}
- */
-const filterChangedFiles = (changedFiles, ignoreFiles) => {
-    const filteredFiles = changedFiles.filter((file) => {
-        return !ignoreFiles.includes(file.split('/').pop());
-    });
-
-    if (filteredFiles.length) {
-        return filteredFiles;
-    }
-
-    return changedFiles;
-};
-
-/**
- * @param {string[]} changedFiles
- * @param {string} filename
- * @param {RegExp} regex
- * @returns {string[]}
- */
-const getMetaFiles = async (changedFiles, filename, regex) => {
-    const queue = changedFiles.map(async (filePath) => {
-        return findNearestFile(filename, filePath, regex);
-    });
-
-    const results = await Promise.all(queue);
-
-    return [...new Set(results.flat())].filter(Boolean);
-};
-
-/**
- * @param {string[]} files
- * @returns {InfoMap}
- */
-const getMetaInfoFromFiles = async (files) => {
-    const infoMap = {};
-
-    await Promise.all(...[files.map(async (file) => {
-        if (!file) {
-            return;
-        }
-
-        try {
-            const data = (await fse.readFile(file, 'utf8'));
-            const dataToArray = data.split('\n');
-            infoMap[file] = dataToArray.filter(Boolean);
-
-        } catch (e) {
-            console.error(`file: ${file} errored while reading data: ${e}`);
-            return Promise.resolve();
-        }
-    })]);
-
-    return infoMap;
-};
-
-/**
- *
- * @param {InfoMap} infoMap
- * @param {string[]} changedFiles
- * @param {string} createdBy
- * @returns {OwnersMap}
- */
-const getOwnersMap = (infoMap, changedFiles, createdBy) => {
-    /** @type {OwnersMap} */
-    const ownersMap = {};
-
-    /** @type {InfoMap} */
-    const infoDirMap = {};
-
-    /**
-     * @param {string[]} owners
-     * @param {string} filePath
-     */
-    const addFileToOwners = (owners, filePath) => {
-        owners.forEach((owner) => {
-           ownersMap[owner].ownedFiles.push(filePath);
-        });
-    };
-
-    Object.entries(infoMap).forEach(([filePath, owners]) => {
-        owners.forEach((owner) => {
-            if (!ownersMap[owner]) {
-                ownersMap[owner] = {
-                    sources: [],
-                    ownedFiles: []
-                }
-            }
-
-            ownersMap[owner].sources.push(filePath);
-        });
-
-        const dir = path.dirname(filePath);
-        infoDirMap[dir] = owners;
-    });
-
-    changedFiles.forEach((file) => {
-        const owners = [...new Set(Object.keys(infoDirMap).reduce((acc, path) => {
-            if (file.startsWith(path)) {
-                acc.push(...infoDirMap[path]);
-            }
-
-            return acc;
-        }, []))].filter(Boolean);
-
-        addFileToOwners(owners, file);
-    });
-
-    // Remove owner of PR
-    delete ownersMap[createdBy];
-
-    return ownersMap;
-};
-
-/**
- *
- * @param {string} file
- * @param {string} pathPrefix
- * @returns {string}
- */
-const removePrefixPathFromFile = (file, pathPrefix) => {
-    return file.substr(pathPrefix.length + 1);
-};
-
-/**
- * @param {OwnersMap} codeowners
- * @param {string[]} files
- * @param {string} pathPrefix
- */
-const createRequiredApprovalsComment = (codeowners, files, pathPrefix) => {
-    const filesMap = files.map((file) => {
-        const fileOwners = Object.entries(codeowners).reduce((acc, [codeowner, data]) => {
-            if (data.ownedFiles.includes(file)) {
-                acc.push(codeowner);
-            }
-
-            return acc;
-        }, []);
-
-        return `- ${removePrefixPathFromFile(file, pathPrefix)} (${fileOwners.join(', ')})`;
-    }).join('\n');
-
-    return (`Approval is still required for ${files.length} files\n${filesMap}`);
-};
-
-
-module.exports = {
-    getMetaFiles,
-    getMetaInfoFromFiles,
-    filterChangedFiles,
-    getOwnersMap,
-    createRequiredApprovalsComment,
-    validateLabelsMap,
-    getNextPages,
-    getRegex,
-};
-
-/** @typedef {import('@octokit/types/dist-types/ResponseHeaders.d.ts').ResponseHeaders} ResponseHeaders */
-
-/** @typedef {Record<string, string[]>} InfoMap */
-
-/** @typedef {Record<string, OwnerData>} OwnersMap */
-
-/**
- * @typedef {Object} OwnerData
- * @prop {string[]} sources
- * @prop {string[]} ownedFiles
- */
+module.exports = {validateLabelsMap};
 
 
 /***/ }),
@@ -27152,7 +27364,7 @@ module.exports = eval("require")("encoding");
 
 /***/ }),
 
-/***/ 2357:
+/***/ 9491:
 /***/ ((module) => {
 
 "use strict";
@@ -27160,7 +27372,7 @@ module.exports = require("assert");
 
 /***/ }),
 
-/***/ 7619:
+/***/ 2057:
 /***/ ((module) => {
 
 "use strict";
@@ -27168,7 +27380,7 @@ module.exports = require("constants");
 
 /***/ }),
 
-/***/ 8614:
+/***/ 2361:
 /***/ ((module) => {
 
 "use strict";
@@ -27176,7 +27388,7 @@ module.exports = require("events");
 
 /***/ }),
 
-/***/ 5747:
+/***/ 7147:
 /***/ ((module) => {
 
 "use strict";
@@ -27184,7 +27396,7 @@ module.exports = require("fs");
 
 /***/ }),
 
-/***/ 8605:
+/***/ 3685:
 /***/ ((module) => {
 
 "use strict";
@@ -27192,7 +27404,7 @@ module.exports = require("http");
 
 /***/ }),
 
-/***/ 7211:
+/***/ 5687:
 /***/ ((module) => {
 
 "use strict";
@@ -27200,7 +27412,7 @@ module.exports = require("https");
 
 /***/ }),
 
-/***/ 1631:
+/***/ 1808:
 /***/ ((module) => {
 
 "use strict";
@@ -27208,7 +27420,7 @@ module.exports = require("net");
 
 /***/ }),
 
-/***/ 2087:
+/***/ 2037:
 /***/ ((module) => {
 
 "use strict";
@@ -27216,7 +27428,7 @@ module.exports = require("os");
 
 /***/ }),
 
-/***/ 5622:
+/***/ 1017:
 /***/ ((module) => {
 
 "use strict";
@@ -27224,7 +27436,7 @@ module.exports = require("path");
 
 /***/ }),
 
-/***/ 1191:
+/***/ 3477:
 /***/ ((module) => {
 
 "use strict";
@@ -27232,7 +27444,7 @@ module.exports = require("querystring");
 
 /***/ }),
 
-/***/ 2413:
+/***/ 2781:
 /***/ ((module) => {
 
 "use strict";
@@ -27240,7 +27452,7 @@ module.exports = require("stream");
 
 /***/ }),
 
-/***/ 4016:
+/***/ 4404:
 /***/ ((module) => {
 
 "use strict";
@@ -27248,7 +27460,7 @@ module.exports = require("tls");
 
 /***/ }),
 
-/***/ 8835:
+/***/ 7310:
 /***/ ((module) => {
 
 "use strict";
@@ -27256,7 +27468,7 @@ module.exports = require("url");
 
 /***/ }),
 
-/***/ 1669:
+/***/ 3837:
 /***/ ((module) => {
 
 "use strict";
@@ -27264,7 +27476,7 @@ module.exports = require("util");
 
 /***/ }),
 
-/***/ 8761:
+/***/ 9796:
 /***/ ((module) => {
 
 "use strict";
@@ -27325,14 +27537,15 @@ module.exports = require("zlib");
 var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
-const path = __nccwpck_require__(5622);
+const path = __nccwpck_require__(1017);
 const core = __nccwpck_require__(2186);
 const {
     context,
     getOctokit,
 } = __nccwpck_require__(5438);
 
-const utils = __nccwpck_require__(1608);
+const utils = __nccwpck_require__(2070);
+const {ReviewStates} = __nccwpck_require__(1987);
 
 const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
 
@@ -27349,9 +27562,66 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     const pull_number = pull_request.number;
 
     /**
+     * @returns {string[]}
+     */
+    const getChangedFiles = async () => {
+        const listFiles = await octokit.paginate(octokit.rest.pulls.listFiles.endpoint.merge({
+            ...context.repo,
+            pull_number,
+        }));
+
+        return listFiles.map((file) => {
+            // @see https://docs.github.com/en/actions/reference/environment-variables
+            return path.join(PATH_PREFIX, file.filename);
+        });
+    };
+
+    const getLabels = async () => {
+        const labels = await octokit.rest.issues.listLabelsOnIssue({
+            ...context.repo,
+            issue_number: pull_number,
+        });
+
+        return labels.data.map((label) => label.name);
+    };
+
+    /**
+     * @returns {Promise<string>}
+     */
+    const getUser = async () => {
+        const authInfo = await octokit.rest.users.getAuthenticated();
+        return authInfo.data.login;
+    }
+
+    /**
+     * @returns {$Reviewers.GitHub.Review[]}
+     */
+    const getListReviews = async () => {
+        const route = `GET /repos/${repo.owner}/${repo.repo}/pulls/${pull_number}/reviews`;
+        const options = {per_page: 100};
+
+        const response = await octokit.request(route, options);
+
+        const nextPages = utils.getNextPages(response.headers, route);
+
+        if(!nextPages) {
+            return response.data;
+        }
+
+        return [
+            response.data,
+            await Promise.all(
+                nextPages.map(async (page) => {
+                    return (await octokit.request(page, options)).data;
+                }),
+            ),
+        ].flat(2);
+    };
+
+    /**
      * @returns {Record<string, string>}
      */
-    const parseLabelsMap = () => {
+    const getLabelsMap = () => {
         if (!labelsMap) {
             return undefined;
         }
@@ -27374,69 +27644,12 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     };
 
     /**
-     * @param {string[]} changedFiles
-     */
-    const printChangedFiles = (changedFiles) => {
-        core.startGroup('Changed Files');
-        changedFiles.forEach((file) => {
-            core.info(`- ${file}`);
-        });
-        core.endGroup();
-        // break line
-        core.info('');
-    };
-
-    /**
-     * @returns {string[]}
-     */
-    const getChangedFiles = async () => {
-        const listFilesOptions = octokit.rest.pulls.listFiles.endpoint.merge({
-            ...context.repo,
-            pull_number,
-        });
-
-        const listFilesResponse = await octokit.paginate(listFilesOptions);
-
-        const changedFiles = listFilesResponse.map((file) => {
-            // @see https://docs.github.com/en/actions/reference/environment-variables
-            return path.join(PATH_PREFIX, file.filename);
-        });
-
-        return changedFiles;
-    };
-
-    const getLabels = async () => {
-        const labels = await octokit.rest.issues.listLabelsOnIssue({
-            ...context.repo,
-            issue_number: pull_number,
-        });
-
-        return labels.data.map((label) => label.name);
-    };
-
-    /**
-     * @param {string} createdBy
-     * @param {string[]} changedFiles
-     * @param {string} level
-     */
-    const getCodeOwners = async (createdBy, changedFiles, level) => {
-        let reviewersFiles = await utils.getMetaFiles(changedFiles, ownersFilename, utils.getRegex(level, PATH_PREFIX));
-
-        if (reviewersFiles.length <= 0) {
-            reviewersFiles = [ownersFilename];
-        }
-
-        const reviewersMap = await utils.getMetaInfoFromFiles(reviewersFiles);
-        return utils.getOwnersMap(reviewersMap, changedFiles, createdBy);
-    };
-
-    /**
-     * @returns {string}
+     * @returns {Promise<string>}
      */
     const getReviewersLevel = async () => {
         // no level
         const DEFAULT_LEVEL = '';
-        const labelsMapObj = parseLabelsMap();
+        const labelsMapObj = getLabelsMap();
 
         if (!labelsMapObj) {
             return DEFAULT_LEVEL;
@@ -27449,24 +27662,30 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
             return labelsBelongsToAction.includes(label);
         });
 
-        if (matchedLabels.length <= 0) {
-            return DEFAULT_LEVEL;
-        } else if(matchedLabels.length === 1) {
-            return labelsMapObj[matchedLabels[0]];
-        } else {
-            const labelsPaths = matchedLabels.map((label) => labelsMapObj[label]);
+        switch (matchedLabels.length) {
+            case 0: {
+                return DEFAULT_LEVEL;
+            }
 
-            return labelsPaths.reduce((currentPath, nextPath) => {
-                const relative = path.relative(nextPath, currentPath);
-                const isSubDir = relative && !relative.startsWith("..") && !path.isAbsolute(relative);
+            case 1: {
+                return labelsMapObj[matchedLabels[0]];
+            }
 
-                return isSubDir ? nextPath : currentPath;
-            }, '**');
+            default: {
+                const labelsPaths = matchedLabels.map((label) => labelsMapObj[label]);
+
+                return labelsPaths.reduce((currentPath, nextPath) => {
+                    const relative = path.relative(nextPath, currentPath);
+                    const isSubDir = relative && !relative.startsWith('..') && !path.isAbsolute(relative);
+
+                    return isSubDir ? nextPath : currentPath;
+                }, '**');
+            }
         }
     };
 
     /**
-     * @param {OwnersMap} codeowners
+     * @param {string[]} codeowners
      * @param {string[]} reviewers
      * @returns {Promise<OwnersMap>}
      */
@@ -27474,23 +27693,24 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         const {repo} = context;
 
         /** @type {string[]} */
-        let reviewersOnPr = [];
+        let requestedReviewers = [];
 
-        const requestedReviewers = (await octokit.rest.pulls.listRequestedReviewers({
+
+        const requestedReviewersResponse = /** @type {RequestedReviewers} */((await octokit.rest.pulls.listRequestedReviewers({
             ...repo,
             pull_number,
-        })).data;
+        })).data);
 
-        if (requestedReviewers.users) {
-            reviewersOnPr = requestedReviewers.users.map((user) => {
+        if (requestedReviewersResponse.users) {
+            requestedReviewers = requestedReviewersResponse.users.map((user) => {
                 return user.login;
             });
         }
 
-        reviewersOnPr = [...new Set([reviewersOnPr, reviewers].flat())];
+        requestedReviewers = [...new Set([...requestedReviewers, ...reviewers])];
 
-        const reviewersFromFiles = Object.keys(codeowners);
-        const reviewersToAdd = reviewersFromFiles.filter((reviewer) => !reviewersOnPr.includes(reviewer));
+        const reviewersToAdd = codeowners.filter((reviewer) => !requestedReviewers.includes(reviewer));
+
 
         if (reviewersToAdd.length > 0) {
             await octokit.rest.pulls.requestReviewers({
@@ -27502,98 +27722,43 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     };
 
     /**
-     * @returns {Promise<string>}
-     */
-    const getUser = async () => {
-        const authInfo = await octokit.rest.users.getAuthenticated();
-        return authInfo.data.login;
-    }
-
-    /**
-     * pagination is not possible see https://github.com/octokit/rest.js/issues/33
-     *
-     * @returns {Promise<Record<string, object>>}
-     */
-    const getReviewers = async () => {
-        const route = `GET /repos/${repo.owner}/${repo.repo}/pulls/${pull_number}/reviews`;
-        const options = {per_page: 100};
-
-        const response = await octokit.request(route, options);
-
-        const nextPages = utils.getNextPages(response.headers, route);
-
-        let allReviewersData;
-
-        if(!nextPages) {
-            allReviewersData = response.data;
-        } else {
-            allReviewersData = [
-                response.data,
-                await Promise.all(
-                    nextPages.map(async (page) => {
-                        return (await octokit.request(page, options)).data;
-                    }),
-                ),
-            ].flat(2);
-        }
-
-        const latestReviews = {};
-
-        allReviewersData.forEach((review) => {
-            const user = review.user.login;
-            const hasUserAlready = Boolean(latestReviews[user]);
-
-            // https://docs.github.com/en/graphql/reference/enums#pullrequestreviewstate
-            if (!['APPROVED', 'CHANGES_REQUESTED', 'DISMISSED'].includes(review.state)) {
-                return;
-            }
-
-            if (!hasUserAlready) {
-                latestReviews[user] = review;
-            } else if (review.submitted_at > latestReviews[user].submitted_at) {
-                latestReviews[user] = review;
-            }
-        });
-
-        return latestReviews;
-    };
-
-    /**
-     * @param {OwnersMap} codeowners
-     * @param {string[]} reviewers
+     * @param {$Reviewers.OwnersMap} ownersMap
+     * @param {$Reviewers.LatestUserReviewMap} latestUserReviewMap
      * @param {string[]} changedFiles
-     * @param {boolean} [shouldDismiss]
      * @returns {Promise<void>}
      */
-    const approvalProcess = async (codeowners, reviewers, changedFiles, shouldDismiss) => {
-        const approvers = Object.keys(reviewers).filter((reviewer) => {
-            return reviewers[reviewer].state === 'APPROVED';
+    const approvalProcess = async (ownersMap, latestUserReviewMap, changedFiles) => {
+        const approvers = Object.keys(latestUserReviewMap).filter((reviewer) => {
+            return latestUserReviewMap[reviewer].state === ReviewStates.APPROVED;
         });
 
-        const allApprovedFiles = [...new Set(approvers.reduce((acc, approver) => {
-            if(codeowners[approver]) {
-                acc.push(...codeowners[approver].ownedFiles);
+        const allApprovedFiles = Object.entries(ownersMap).reduce((result, [path, owners]) => {
+            const ownedFile = owners.some((owner) => approvers.includes(owner));
+
+            if (ownedFile) {
+                result.push(path);
             }
-            return acc;
-        }, []))];
+
+            return result;
+        }, []);
 
         const filesWhichStillNeedApproval = changedFiles.filter((file) => {
             return !allApprovedFiles.includes(file);
         });
 
-        const approvedByTheCurrentUser = reviewers[user] && reviewers[user].state === 'APPROVED';
+        const approvedByTheCurrentUser = latestUserReviewMap[user] && latestUserReviewMap[user].state === ReviewStates.APPROVED;
 
         if (filesWhichStillNeedApproval.length > 0) {
-            core.warning("No sufficient approvals can't approve the pull-request");
-            core.info(utils.createRequiredApprovalsComment(codeowners, filesWhichStillNeedApproval, PATH_PREFIX));
+            core.warning('No sufficient approvals can\'t approve the pull-request');
+            core.info(utils.createRequiredApprovalsComment(ownersMap, filesWhichStillNeedApproval, PATH_PREFIX));
 
 
-            if (approvedByTheCurrentUser && shouldDismiss) {
+            if (approvedByTheCurrentUser) {
                 // Dismiss
                 await octokit.rest.pulls.dismissReview({
                     ...repo,
                     pull_number,
-                    review_id: reviewers[user].id,
+                    review_id: latestUserReviewMap[user].id,
                     message: 'No sufficient approvals',
                 });
             }
@@ -27608,28 +27773,45 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         }
     };
 
+    /**
+     * @param {string[]} changedFiles
+     */
+    const printChangedFiles = (changedFiles) => {
+        core.startGroup('Changed Files');
+        changedFiles.forEach((file) => {
+            core.info(`- ${file}`);
+        });
+        core.endGroup();
+        // break line
+        core.info('');
+    };
+
     const [
         changedFiles,
-        reviewers,
         user,
         level,
+        listReviews,
     ] = await Promise.all([
         getChangedFiles(),
-        getReviewers(),
         getUser(),
         getReviewersLevel(),
+        getListReviews(),
     ]);
 
     printChangedFiles(changedFiles);
+
+    const latestUserReviewMap = utils.getLatestUserReviewMap(listReviews);
     const filteredChangedFiles = utils.filterChangedFiles(changedFiles, ignoreFiles);
-    const codeowners = await getCodeOwners(pull_request.user.login, filteredChangedFiles, level);
+    const ownersMap = await utils.createOwnersMap(changedFiles, ownersFilename, utils.getRegex(level, PATH_PREFIX));
+    const codeowners = await utils.getOwners(ownersMap, path.join(PATH_PREFIX, ownersFilename), pull_request.user.login);
+
     core.info(`level is: ${level}`);
 
     switch (context.eventName) {
         case 'pull_request': {
             await Promise.all([
-                assignReviewers(codeowners, Object.keys(reviewers)),
-                approvalProcess(codeowners, reviewers, filteredChangedFiles, true),
+                assignReviewers(codeowners, utils.getListReviewers(listReviews)),
+                approvalProcess(ownersMap, latestUserReviewMap, filteredChangedFiles),
             ]);
 
             break;
@@ -27641,7 +27823,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
                 context.payload.sender.login !== user  &&
                 (/approved|dismissed/).test(context.payload.review.state)
             ) {
-                await approvalProcess(codeowners, reviewers, filteredChangedFiles, true);
+                await approvalProcess(ownersMap, latestUserReviewMap, filteredChangedFiles);
             }
 
             break;
@@ -27655,28 +27837,6 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     core.setFailed(error);
     process.exit(1);
 });
-
-/**
- * @typedef {Object} PullRequestHandlerData
- * @prop {string[]} changedFiles
- * @prop {PullRequest} pull_request
- * @prop {ArtifactData} artifactData
- * @prop {OwnersMap} codeowners
- */
-
-/**
- * @typedef {Object} PullRequest
- * @prop {number} number
- * @prop {User} user
- */
-
-/**
- * @typedef {Object} User
- * @prop {string} login
- */
-
-
-/** @typedef {import('./utils').OwnersMap} OwnersMap */
 
 })();
 

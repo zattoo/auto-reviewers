@@ -6,6 +6,7 @@ const {
 } = require('@actions/github');
 
 const utils = require('./utils');
+const {ReviewStates} = require('./enums');
 
 const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
 
@@ -22,9 +23,66 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     const pull_number = pull_request.number;
 
     /**
+     * @returns {string[]}
+     */
+    const getChangedFiles = async () => {
+        const listFiles = await octokit.paginate(octokit.rest.pulls.listFiles.endpoint.merge({
+            ...context.repo,
+            pull_number,
+        }));
+
+        return listFiles.map((file) => {
+            // @see https://docs.github.com/en/actions/reference/environment-variables
+            return path.join(PATH_PREFIX, file.filename);
+        });
+    };
+
+    const getLabels = async () => {
+        const labels = await octokit.rest.issues.listLabelsOnIssue({
+            ...context.repo,
+            issue_number: pull_number,
+        });
+
+        return labels.data.map((label) => label.name);
+    };
+
+    /**
+     * @returns {Promise<string>}
+     */
+    const getUser = async () => {
+        const authInfo = await octokit.rest.users.getAuthenticated();
+        return authInfo.data.login;
+    }
+
+    /**
+     * @returns {$Reviewers.GitHub.Review[]}
+     */
+    const getListReviews = async () => {
+        const route = `GET /repos/${repo.owner}/${repo.repo}/pulls/${pull_number}/reviews`;
+        const options = {per_page: 100};
+
+        const response = await octokit.request(route, options);
+
+        const nextPages = utils.getNextPages(response.headers, route);
+
+        if(!nextPages) {
+            return response.data;
+        }
+
+        return [
+            response.data,
+            await Promise.all(
+                nextPages.map(async (page) => {
+                    return (await octokit.request(page, options)).data;
+                }),
+            ),
+        ].flat(2);
+    };
+
+    /**
      * @returns {Record<string, string>}
      */
-    const parseLabelsMap = () => {
+    const getLabelsMap = () => {
         if (!labelsMap) {
             return undefined;
         }
@@ -47,69 +105,12 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     };
 
     /**
-     * @param {string[]} changedFiles
-     */
-    const printChangedFiles = (changedFiles) => {
-        core.startGroup('Changed Files');
-        changedFiles.forEach((file) => {
-            core.info(`- ${file}`);
-        });
-        core.endGroup();
-        // break line
-        core.info('');
-    };
-
-    /**
-     * @returns {string[]}
-     */
-    const getChangedFiles = async () => {
-        const listFilesOptions = octokit.rest.pulls.listFiles.endpoint.merge({
-            ...context.repo,
-            pull_number,
-        });
-
-        const listFilesResponse = await octokit.paginate(listFilesOptions);
-
-        const changedFiles = listFilesResponse.map((file) => {
-            // @see https://docs.github.com/en/actions/reference/environment-variables
-            return path.join(PATH_PREFIX, file.filename);
-        });
-
-        return changedFiles;
-    };
-
-    const getLabels = async () => {
-        const labels = await octokit.rest.issues.listLabelsOnIssue({
-            ...context.repo,
-            issue_number: pull_number,
-        });
-
-        return labels.data.map((label) => label.name);
-    };
-
-    /**
-     * @param {string} createdBy
-     * @param {string[]} changedFiles
-     * @param {string} level
-     */
-    const getCodeOwners = async (createdBy, changedFiles, level) => {
-        let reviewersFiles = await utils.getMetaFiles(changedFiles, ownersFilename, utils.getRegex(level, PATH_PREFIX));
-
-        if (reviewersFiles.length <= 0) {
-            reviewersFiles = [ownersFilename];
-        }
-
-        const reviewersMap = await utils.getMetaInfoFromFiles(reviewersFiles);
-        return utils.getOwnersMap(reviewersMap, changedFiles, createdBy);
-    };
-
-    /**
-     * @returns {string}
+     * @returns {Promise<string>}
      */
     const getReviewersLevel = async () => {
         // no level
         const DEFAULT_LEVEL = '';
-        const labelsMapObj = parseLabelsMap();
+        const labelsMapObj = getLabelsMap();
 
         if (!labelsMapObj) {
             return DEFAULT_LEVEL;
@@ -122,24 +123,30 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
             return labelsBelongsToAction.includes(label);
         });
 
-        if (matchedLabels.length <= 0) {
-            return DEFAULT_LEVEL;
-        } else if(matchedLabels.length === 1) {
-            return labelsMapObj[matchedLabels[0]];
-        } else {
-            const labelsPaths = matchedLabels.map((label) => labelsMapObj[label]);
+        switch (matchedLabels.length) {
+            case 0: {
+                return DEFAULT_LEVEL;
+            }
 
-            return labelsPaths.reduce((currentPath, nextPath) => {
-                const relative = path.relative(nextPath, currentPath);
-                const isSubDir = relative && !relative.startsWith("..") && !path.isAbsolute(relative);
+            case 1: {
+                return labelsMapObj[matchedLabels[0]];
+            }
 
-                return isSubDir ? nextPath : currentPath;
-            }, '**');
+            default: {
+                const labelsPaths = matchedLabels.map((label) => labelsMapObj[label]);
+
+                return labelsPaths.reduce((currentPath, nextPath) => {
+                    const relative = path.relative(nextPath, currentPath);
+                    const isSubDir = relative && !relative.startsWith('..') && !path.isAbsolute(relative);
+
+                    return isSubDir ? nextPath : currentPath;
+                }, '**');
+            }
         }
     };
 
     /**
-     * @param {OwnersMap} codeowners
+     * @param {string[]} codeowners
      * @param {string[]} reviewers
      * @returns {Promise<OwnersMap>}
      */
@@ -147,23 +154,24 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         const {repo} = context;
 
         /** @type {string[]} */
-        let reviewersOnPr = [];
+        let requestedReviewers = [];
 
-        const requestedReviewers = (await octokit.rest.pulls.listRequestedReviewers({
+
+        const requestedReviewersResponse = /** @type {RequestedReviewers} */((await octokit.rest.pulls.listRequestedReviewers({
             ...repo,
             pull_number,
-        })).data;
+        })).data);
 
-        if (requestedReviewers.users) {
-            reviewersOnPr = requestedReviewers.users.map((user) => {
+        if (requestedReviewersResponse.users) {
+            requestedReviewers = requestedReviewersResponse.users.map((user) => {
                 return user.login;
             });
         }
 
-        reviewersOnPr = [...new Set([reviewersOnPr, reviewers].flat())];
+        requestedReviewers = [...new Set([...requestedReviewers, ...reviewers])];
 
-        const reviewersFromFiles = Object.keys(codeowners);
-        const reviewersToAdd = reviewersFromFiles.filter((reviewer) => !reviewersOnPr.includes(reviewer));
+        const reviewersToAdd = codeowners.filter((reviewer) => !requestedReviewers.includes(reviewer));
+
 
         if (reviewersToAdd.length > 0) {
             await octokit.rest.pulls.requestReviewers({
@@ -175,98 +183,43 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     };
 
     /**
-     * @returns {Promise<string>}
-     */
-    const getUser = async () => {
-        const authInfo = await octokit.rest.users.getAuthenticated();
-        return authInfo.data.login;
-    }
-
-    /**
-     * pagination is not possible see https://github.com/octokit/rest.js/issues/33
-     *
-     * @returns {Promise<Record<string, object>>}
-     */
-    const getReviewers = async () => {
-        const route = `GET /repos/${repo.owner}/${repo.repo}/pulls/${pull_number}/reviews`;
-        const options = {per_page: 100};
-
-        const response = await octokit.request(route, options);
-
-        const nextPages = utils.getNextPages(response.headers, route);
-
-        let allReviewersData;
-
-        if(!nextPages) {
-            allReviewersData = response.data;
-        } else {
-            allReviewersData = [
-                response.data,
-                await Promise.all(
-                    nextPages.map(async (page) => {
-                        return (await octokit.request(page, options)).data;
-                    }),
-                ),
-            ].flat(2);
-        }
-
-        const latestReviews = {};
-
-        allReviewersData.forEach((review) => {
-            const user = review.user.login;
-            const hasUserAlready = Boolean(latestReviews[user]);
-
-            // https://docs.github.com/en/graphql/reference/enums#pullrequestreviewstate
-            if (!['APPROVED', 'CHANGES_REQUESTED', 'DISMISSED'].includes(review.state)) {
-                return;
-            }
-
-            if (!hasUserAlready) {
-                latestReviews[user] = review;
-            } else if (review.submitted_at > latestReviews[user].submitted_at) {
-                latestReviews[user] = review;
-            }
-        });
-
-        return latestReviews;
-    };
-
-    /**
-     * @param {OwnersMap} codeowners
-     * @param {string[]} reviewers
+     * @param {$Reviewers.OwnersMap} ownersMap
+     * @param {$Reviewers.LatestUserReviewMap} latestUserReviewMap
      * @param {string[]} changedFiles
-     * @param {boolean} [shouldDismiss]
      * @returns {Promise<void>}
      */
-    const approvalProcess = async (codeowners, reviewers, changedFiles, shouldDismiss) => {
-        const approvers = Object.keys(reviewers).filter((reviewer) => {
-            return reviewers[reviewer].state === 'APPROVED';
+    const approvalProcess = async (ownersMap, latestUserReviewMap, changedFiles) => {
+        const approvers = Object.keys(latestUserReviewMap).filter((reviewer) => {
+            return latestUserReviewMap[reviewer].state === ReviewStates.APPROVED;
         });
 
-        const allApprovedFiles = [...new Set(approvers.reduce((acc, approver) => {
-            if(codeowners[approver]) {
-                acc.push(...codeowners[approver].ownedFiles);
+        const allApprovedFiles = Object.entries(ownersMap).reduce((result, [path, owners]) => {
+            const ownedFile = owners.some((owner) => approvers.includes(owner));
+
+            if (ownedFile) {
+                result.push(path);
             }
-            return acc;
-        }, []))];
+
+            return result;
+        }, []);
 
         const filesWhichStillNeedApproval = changedFiles.filter((file) => {
             return !allApprovedFiles.includes(file);
         });
 
-        const approvedByTheCurrentUser = reviewers[user] && reviewers[user].state === 'APPROVED';
+        const approvedByTheCurrentUser = latestUserReviewMap[user] && latestUserReviewMap[user].state === ReviewStates.APPROVED;
 
         if (filesWhichStillNeedApproval.length > 0) {
-            core.warning("No sufficient approvals can't approve the pull-request");
-            core.info(utils.createRequiredApprovalsComment(codeowners, filesWhichStillNeedApproval, PATH_PREFIX));
+            core.warning('No sufficient approvals can\'t approve the pull-request');
+            core.info(utils.createRequiredApprovalsComment(ownersMap, filesWhichStillNeedApproval, PATH_PREFIX));
 
 
-            if (approvedByTheCurrentUser && shouldDismiss) {
+            if (approvedByTheCurrentUser) {
                 // Dismiss
                 await octokit.rest.pulls.dismissReview({
                     ...repo,
                     pull_number,
-                    review_id: reviewers[user].id,
+                    review_id: latestUserReviewMap[user].id,
                     message: 'No sufficient approvals',
                 });
             }
@@ -281,28 +234,45 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         }
     };
 
+    /**
+     * @param {string[]} changedFiles
+     */
+    const printChangedFiles = (changedFiles) => {
+        core.startGroup('Changed Files');
+        changedFiles.forEach((file) => {
+            core.info(`- ${file}`);
+        });
+        core.endGroup();
+        // break line
+        core.info('');
+    };
+
     const [
         changedFiles,
-        reviewers,
         user,
         level,
+        listReviews,
     ] = await Promise.all([
         getChangedFiles(),
-        getReviewers(),
         getUser(),
         getReviewersLevel(),
+        getListReviews(),
     ]);
 
     printChangedFiles(changedFiles);
+
+    const latestUserReviewMap = utils.getLatestUserReviewMap(listReviews);
     const filteredChangedFiles = utils.filterChangedFiles(changedFiles, ignoreFiles);
-    const codeowners = await getCodeOwners(pull_request.user.login, filteredChangedFiles, level);
+    const ownersMap = await utils.createOwnersMap(changedFiles, ownersFilename, utils.getRegex(level, PATH_PREFIX));
+    const codeowners = await utils.getOwners(ownersMap, path.join(PATH_PREFIX, ownersFilename), pull_request.user.login);
+
     core.info(`level is: ${level}`);
 
     switch (context.eventName) {
         case 'pull_request': {
             await Promise.all([
-                assignReviewers(codeowners, Object.keys(reviewers)),
-                approvalProcess(codeowners, reviewers, filteredChangedFiles, true),
+                assignReviewers(codeowners, utils.getListReviewers(listReviews)),
+                approvalProcess(ownersMap, latestUserReviewMap, filteredChangedFiles),
             ]);
 
             break;
@@ -314,7 +284,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
                 context.payload.sender.login !== user  &&
                 (/approved|dismissed/).test(context.payload.review.state)
             ) {
-                await approvalProcess(codeowners, reviewers, filteredChangedFiles, true);
+                await approvalProcess(ownersMap, latestUserReviewMap, filteredChangedFiles);
             }
 
             break;
@@ -328,25 +298,3 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     core.setFailed(error);
     process.exit(1);
 });
-
-/**
- * @typedef {Object} PullRequestHandlerData
- * @prop {string[]} changedFiles
- * @prop {PullRequest} pull_request
- * @prop {ArtifactData} artifactData
- * @prop {OwnersMap} codeowners
- */
-
-/**
- * @typedef {Object} PullRequest
- * @prop {number} number
- * @prop {User} user
- */
-
-/**
- * @typedef {Object} User
- * @prop {string} login
- */
-
-
-/** @typedef {import('./utils').OwnersMap} OwnersMap */

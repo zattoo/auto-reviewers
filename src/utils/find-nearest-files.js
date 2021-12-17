@@ -66,9 +66,9 @@ const findFiles = async (filename, directory, regex, foundFiles = []) => {
  * @param {string} filename
  * @param {string} root
  * @param {RegExp} regex
- * @returns {string[]}
+ * @returns {Promise<string[]>}
  */
-const findNearestFile = async (filename, root, regex) => {
+const findNearestFiles = async (filename, root, regex) => {
     if (!filename) {
         throw new Error('filename is required');
     }
@@ -80,4 +80,4 @@ const findNearestFile = async (filename, root, regex) => {
     return findFiles(filename, root, regex);
 };
 
-module.exports = {findNearestFile}
+module.exports = {findNearestFiles}
