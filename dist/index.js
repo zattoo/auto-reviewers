@@ -27711,7 +27711,6 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
 
         const reviewersToAdd = codeowners.filter((reviewer) => !requestedReviewers.includes(reviewer));
 
-
         if (reviewersToAdd.length > 0) {
             await octokit.rest.pulls.requestReviewers({
                 ...repo,
@@ -27751,7 +27750,6 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         if (filesWhichStillNeedApproval.length > 0) {
             core.warning('No sufficient approvals can\'t approve the pull-request');
             core.info(utils.createRequiredApprovalsComment(ownersMap, filesWhichStillNeedApproval, PATH_PREFIX));
-
 
             if (approvedByTheCurrentUser) {
                 // Dismiss
