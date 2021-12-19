@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Unreleased
 
 ### Fixed
-- ignored files were included into changed files
+- Ignored files were included in changed files
 
 ## 3.0.0 - 17.12.2021
 
