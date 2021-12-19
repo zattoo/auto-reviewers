@@ -3,10 +3,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+
+### Fixed
+- Ignored files were included in changed files
+
 ## 3.0.0 - 17.12.2021
 
 ### Changed
-- [breaking-changes] Architecture of assigning reviewers, preventing propgation
+- [breaking-changes] Architecture of assigning reviewers, preventing propagation
 
 ## 2.1.1 - 05.11.2021
 
