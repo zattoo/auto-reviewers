@@ -38,9 +38,9 @@ const createCommentBlock = (owners, requiredApproval) => {
         + '<details>'
         + '\n'
         + '<summary>Details</summary>'
-        + '\n'
+        + '\n\n'
         + requiredApproval
-        + '\n'
+        + '\n\n'
         + '</details>'
         + '\n'
         + REVIEWERS_BLOCK_END
