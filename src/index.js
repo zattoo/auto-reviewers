@@ -200,24 +200,20 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     /**
      * @param {$Reviewers.OwnersMap} ownersMap
      * @param {$Reviewers.LatestUserReviewMap} latestUserReviewMap
-     * @param {string[]} changedFiles
      * @returns {Promise<void>}
      */
-    const approvalProcess = async (ownersMap, latestUserReviewMap, changedFiles) => {
+    const approvalProcess = async (ownersMap, latestUserReviewMap) => {
         const approvers = Object.keys(latestUserReviewMap).filter((reviewer) => {
             return latestUserReviewMap[reviewer].state === ReviewStates.APPROVED;
         });
 
-        const filesApproved = [];
         const filesRequired = [];
         let ownersRequired = [];
 
         Object.entries(ownersMap).forEach(([file, owners]) => {
             const ownedFile = owners.some((owner) => approvers.includes(owner));
 
-            if (ownedFile) {
-                filesApproved.push(file);
-            } else {
+            if(!ownedFile) {
                 filesRequired.push(file);
                 ownersRequired.push(...owners);
             }
@@ -293,7 +289,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         case 'pull_request': {
             await Promise.all([
                 assignReviewers(codeowners, utils.getListReviewers(listReviews)),
-                approvalProcess(ownersMap, latestUserReviewMap, filteredChangedFiles),
+                approvalProcess(ownersMap, latestUserReviewMap),
             ]);
 
             break;
@@ -305,7 +301,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
                 context.payload.sender.login !== user  &&
                 (/approved|dismissed/).test(context.payload.review.state)
             ) {
-                await approvalProcess(ownersMap, latestUserReviewMap, filteredChangedFiles);
+                await approvalProcess(ownersMap, latestUserReviewMap);
             }
 
             break;
