@@ -31,7 +31,7 @@ const createCommentBlock = (owners, requiredApproval) => {
     return (
         REVIEWERS_BLOCK_START
         + '\n'
-        + '### Reviewers'
+        + '## Reviewers'
         + '\n\n'
         + `Needs to be approved by: ${owners.map(owner => `@${owner}`).join(', ')}`
         + '\n'
@@ -44,6 +44,7 @@ const createCommentBlock = (owners, requiredApproval) => {
         + '</details>'
         + '\n'
         + REVIEWERS_BLOCK_END
+        + '\n'
     );
 };
 
