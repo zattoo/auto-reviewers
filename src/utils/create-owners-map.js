@@ -31,16 +31,17 @@ const createOwnersFileMap = async (changedFiles, filename, regex) => {
  * @param {string[]} changedFiles
  * @param {string} filename
  * @param {RegExp} regex
+ * @param {string} creator
  * @returns {Promise<$Reviewers.OwnersMap>}
  */
-const createOwnersMap = async (changedFiles, filename, regex) => {
+const createOwnersMap = async (changedFiles, filename, regex, creator) => {
     const ownersFileMap = await createOwnersFileMap(changedFiles, filename, regex);
 
     const fileQueue = Object.entries(ownersFileMap).map(async ([ownersFile, changedFilesList]) => {
-        const ownersData = await readFile(ownersFile);
+        const owners = (await readFile(ownersFile)).filter((owner) => owner !== creator);
 
         return {
-            owners: ownersData,
+            owners,
             changedFilesList,
         };
     });

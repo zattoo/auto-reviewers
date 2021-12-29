@@ -26930,16 +26930,17 @@ const createOwnersFileMap = async (changedFiles, filename, regex) => {
  * @param {string[]} changedFiles
  * @param {string} filename
  * @param {RegExp} regex
+ * @param {string} creator
  * @returns {Promise<$Reviewers.OwnersMap>}
  */
-const createOwnersMap = async (changedFiles, filename, regex) => {
+const createOwnersMap = async (changedFiles, filename, regex, creator) => {
     const ownersFileMap = await createOwnersFileMap(changedFiles, filename, regex);
 
     const fileQueue = Object.entries(ownersFileMap).map(async ([ownersFile, changedFilesList]) => {
-        const ownersData = await readFile(ownersFile);
+        const owners = (await readFile(ownersFile)).filter((owner) => owner !== creator);
 
         return {
-            owners: ownersData,
+            owners,
             changedFilesList,
         };
     });
@@ -26984,6 +26985,84 @@ const createRequiredApprovalsComment = (ownersMap, filesWhichRequireApproval, pa
 
 module.exports = {createRequiredApprovalsComment};
 
+
+
+/***/ }),
+
+/***/ 9526:
+/***/ ((module) => {
+
+const REVIEWERS_BLOCK_START = '<!-- reviewers start -->';
+const REVIEWERS_BLOCK_END = '<!-- reviewers end -->';
+
+const BLOCK_REGEX = new RegExp(`${REVIEWERS_BLOCK_START}(.|\r\n|\n)*${REVIEWERS_BLOCK_END}`);
+
+/**
+ * @param {string} body
+ * @param {string} comment
+ * @returns {boolean}
+ */
+const sameComment = (body, comment) => {
+    const matchedBlock = body.match(BLOCK_REGEX);
+
+    if(!matchedBlock) {
+        return false;
+    }
+
+    return (matchedBlock[0] === comment);
+}
+
+/**
+ * @param {string[]} owners
+ * @param {string} requiredApproval
+ * @returns {string}
+ */
+const createCommentBlock = (owners, requiredApproval) => {
+    if(!owners.length) {
+        return REVIEWERS_BLOCK_START + REVIEWERS_BLOCK_END;
+    }
+
+    return (
+        REVIEWERS_BLOCK_START
+        + '\n'
+        + '### Reviewers'
+        + '\n\n'
+        + `Needs to be approved by: ${owners.map(owner => `@${owner}`).join(', ')}`
+        + '\n'
+        + '<details>'
+        + '\n'
+        + '<summary>Details</summary>'
+        + '\n\n'
+        + requiredApproval
+        + '\n\n'
+        + '</details>'
+        + '\n'
+        + REVIEWERS_BLOCK_END
+    );
+};
+
+/**
+ * @param {string} currentBody
+ * @param {string[]} owners
+ * @param {string} requiredApproval
+ * @returns {string}
+ */
+const createUpdatedBody = (currentBody, owners, requiredApproval) => {
+    const body = currentBody || '';
+    const comment = createCommentBlock(owners, requiredApproval);
+
+    if(sameComment(body, comment)) {
+        return body;
+    }
+
+    if(BLOCK_REGEX.test(body)) {
+        return body.replace(BLOCK_REGEX, comment);
+    }
+
+    return body + '\n\n' + comment;
+};
+
+module.exports = {createUpdatedBody};
 
 
 /***/ }),
@@ -27271,8 +27350,9 @@ module.exports = {getRegex};
 /***/ 2070:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const {createRequiredApprovalsComment} = __nccwpck_require__(2953);
 const {createOwnersMap} = __nccwpck_require__(7561);
+const {createRequiredApprovalsComment} = __nccwpck_require__(2953);
+const {createUpdatedBody} = __nccwpck_require__(9526);
 const {filterChangedFiles} = __nccwpck_require__(3730);
 const {getListReviewers} = __nccwpck_require__(8107);
 const {getLatestUserReviewMap} = __nccwpck_require__(8731);
@@ -27282,8 +27362,9 @@ const {getOwners} = __nccwpck_require__(6425);
 const {validateLabelsMap} = __nccwpck_require__(3848);
 
 module.exports = {
-    createRequiredApprovalsComment,
     createOwnersMap,
+    createRequiredApprovalsComment,
+    createUpdatedBody,
     filterChangedFiles,
     getListReviewers,
     getLatestUserReviewMap,
@@ -27721,35 +27802,51 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     };
 
     /**
+     *
+     * @param {string[]} owners
+     * @param {string} requiredApproval
+     */
+    const updateBody = async (owners, requiredApproval) => {
+        const updatedBody = utils.createUpdatedBody(pull_request.body, owners, requiredApproval);
+
+        await octokit.rest.pulls.update({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            pull_number,
+            body: updatedBody,
+        });
+    };
+
+    /**
      * @param {$Reviewers.OwnersMap} ownersMap
      * @param {$Reviewers.LatestUserReviewMap} latestUserReviewMap
-     * @param {string[]} changedFiles
      * @returns {Promise<void>}
      */
-    const approvalProcess = async (ownersMap, latestUserReviewMap, changedFiles) => {
+    const approvalProcess = async (ownersMap, latestUserReviewMap) => {
         const approvers = Object.keys(latestUserReviewMap).filter((reviewer) => {
             return latestUserReviewMap[reviewer].state === ReviewStates.APPROVED;
         });
 
-        const allApprovedFiles = Object.entries(ownersMap).reduce((result, [path, owners]) => {
+        const filesRequired = [];
+        let ownersRequired = [];
+
+        Object.entries(ownersMap).forEach(([file, owners]) => {
             const ownedFile = owners.some((owner) => approvers.includes(owner));
 
-            if (ownedFile) {
-                result.push(path);
+            if(!ownedFile) {
+                filesRequired.push(file);
+                ownersRequired.push(...owners);
             }
-
-            return result;
-        }, []);
-
-        const filesWhichStillNeedApproval = changedFiles.filter((file) => {
-            return !allApprovedFiles.includes(file);
         });
 
-        const approvedByTheCurrentUser = latestUserReviewMap[user] && latestUserReviewMap[user].state === ReviewStates.APPROVED;
+        ownersRequired = [...new Set(ownersRequired)];
 
-        if (filesWhichStillNeedApproval.length > 0) {
+        const approvedByTheCurrentUser = latestUserReviewMap[user] && latestUserReviewMap[user].state === ReviewStates.APPROVED;
+        const requiredApprovalComment = utils.createRequiredApprovalsComment(ownersMap, filesRequired, PATH_PREFIX);
+
+        if (filesRequired.length > 0) {
             core.warning('No sufficient approvals can\'t approve the pull-request');
-            core.info(utils.createRequiredApprovalsComment(ownersMap, filesWhichStillNeedApproval, PATH_PREFIX));
+            core.info(requiredApprovalComment);
 
             if (approvedByTheCurrentUser) {
                 // Dismiss
@@ -27769,6 +27866,8 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
                 body: '',
             });
         }
+
+        await updateBody(ownersRequired, requiredApprovalComment);
     };
 
     /**
@@ -27800,8 +27899,9 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
 
     const latestUserReviewMap = utils.getLatestUserReviewMap(listReviews);
     const filteredChangedFiles = utils.filterChangedFiles(changedFiles, ignoreFiles);
-    const ownersMap = await utils.createOwnersMap(filteredChangedFiles, ownersFilename, utils.getRegex(level, PATH_PREFIX));
-    const codeowners = await utils.getOwners(ownersMap, path.join(PATH_PREFIX, ownersFilename), pull_request.user.login);
+    const creator = pull_request.user.login;
+    const ownersMap = await utils.createOwnersMap(filteredChangedFiles, ownersFilename, utils.getRegex(level, PATH_PREFIX), creator);
+    const codeowners = await utils.getOwners(ownersMap, path.join(PATH_PREFIX, ownersFilename), creator);
 
     core.info(`level is: ${level}`);
 
@@ -27809,7 +27909,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         case 'pull_request': {
             await Promise.all([
                 assignReviewers(codeowners, utils.getListReviewers(listReviews)),
-                approvalProcess(ownersMap, latestUserReviewMap, filteredChangedFiles),
+                approvalProcess(ownersMap, latestUserReviewMap),
             ]);
 
             break;
@@ -27821,7 +27921,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
                 context.payload.sender.login !== user  &&
                 (/approved|dismissed/).test(context.payload.review.state)
             ) {
-                await approvalProcess(ownersMap, latestUserReviewMap, filteredChangedFiles);
+                await approvalProcess(ownersMap, latestUserReviewMap);
             }
 
             break;

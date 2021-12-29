@@ -182,35 +182,51 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     };
 
     /**
+     *
+     * @param {string[]} owners
+     * @param {string} requiredApproval
+     */
+    const updateBody = async (owners, requiredApproval) => {
+        const updatedBody = utils.createUpdatedBody(pull_request.body, owners, requiredApproval);
+
+        await octokit.rest.pulls.update({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            pull_number,
+            body: updatedBody,
+        });
+    };
+
+    /**
      * @param {$Reviewers.OwnersMap} ownersMap
      * @param {$Reviewers.LatestUserReviewMap} latestUserReviewMap
-     * @param {string[]} changedFiles
      * @returns {Promise<void>}
      */
-    const approvalProcess = async (ownersMap, latestUserReviewMap, changedFiles) => {
+    const approvalProcess = async (ownersMap, latestUserReviewMap) => {
         const approvers = Object.keys(latestUserReviewMap).filter((reviewer) => {
             return latestUserReviewMap[reviewer].state === ReviewStates.APPROVED;
         });
 
-        const allApprovedFiles = Object.entries(ownersMap).reduce((result, [path, owners]) => {
+        const filesRequired = [];
+        let ownersRequired = [];
+
+        Object.entries(ownersMap).forEach(([file, owners]) => {
             const ownedFile = owners.some((owner) => approvers.includes(owner));
 
-            if (ownedFile) {
-                result.push(path);
+            if(!ownedFile) {
+                filesRequired.push(file);
+                ownersRequired.push(...owners);
             }
-
-            return result;
-        }, []);
-
-        const filesWhichStillNeedApproval = changedFiles.filter((file) => {
-            return !allApprovedFiles.includes(file);
         });
 
-        const approvedByTheCurrentUser = latestUserReviewMap[user] && latestUserReviewMap[user].state === ReviewStates.APPROVED;
+        ownersRequired = [...new Set(ownersRequired)];
 
-        if (filesWhichStillNeedApproval.length > 0) {
+        const approvedByTheCurrentUser = latestUserReviewMap[user] && latestUserReviewMap[user].state === ReviewStates.APPROVED;
+        const requiredApprovalComment = utils.createRequiredApprovalsComment(ownersMap, filesRequired, PATH_PREFIX);
+
+        if (filesRequired.length > 0) {
             core.warning('No sufficient approvals can\'t approve the pull-request');
-            core.info(utils.createRequiredApprovalsComment(ownersMap, filesWhichStillNeedApproval, PATH_PREFIX));
+            core.info(requiredApprovalComment);
 
             if (approvedByTheCurrentUser) {
                 // Dismiss
@@ -230,6 +246,8 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
                 body: '',
             });
         }
+
+        await updateBody(ownersRequired, requiredApprovalComment);
     };
 
     /**
@@ -261,8 +279,9 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
 
     const latestUserReviewMap = utils.getLatestUserReviewMap(listReviews);
     const filteredChangedFiles = utils.filterChangedFiles(changedFiles, ignoreFiles);
-    const ownersMap = await utils.createOwnersMap(filteredChangedFiles, ownersFilename, utils.getRegex(level, PATH_PREFIX));
-    const codeowners = await utils.getOwners(ownersMap, path.join(PATH_PREFIX, ownersFilename), pull_request.user.login);
+    const creator = pull_request.user.login;
+    const ownersMap = await utils.createOwnersMap(filteredChangedFiles, ownersFilename, utils.getRegex(level, PATH_PREFIX), creator);
+    const codeowners = await utils.getOwners(ownersMap, path.join(PATH_PREFIX, ownersFilename), creator);
 
     core.info(`level is: ${level}`);
 
@@ -270,7 +289,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         case 'pull_request': {
             await Promise.all([
                 assignReviewers(codeowners, utils.getListReviewers(listReviews)),
-                approvalProcess(ownersMap, latestUserReviewMap, filteredChangedFiles),
+                approvalProcess(ownersMap, latestUserReviewMap),
             ]);
 
             break;
@@ -282,7 +301,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
                 context.payload.sender.login !== user  &&
                 (/approved|dismissed/).test(context.payload.review.state)
             ) {
-                await approvalProcess(ownersMap, latestUserReviewMap, filteredChangedFiles);
+                await approvalProcess(ownersMap, latestUserReviewMap);
             }
 
             break;
