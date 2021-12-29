@@ -182,6 +182,22 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     };
 
     /**
+     *
+     * @param {string[]} owners
+     * @param {string} requiredApproval
+     */
+    const updateBody = async (owners, requiredApproval) => {
+        const updatedBody = utils.createUpdatedBody(pull_request.body, owners, requiredApproval);
+
+        await octokit.rest.pulls.update({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            pull_number,
+            body: updatedBody,
+        });
+    };
+
+    /**
      * @param {$Reviewers.OwnersMap} ownersMap
      * @param {$Reviewers.LatestUserReviewMap} latestUserReviewMap
      * @param {string[]} changedFiles
@@ -192,25 +208,29 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
             return latestUserReviewMap[reviewer].state === ReviewStates.APPROVED;
         });
 
-        const allApprovedFiles = Object.entries(ownersMap).reduce((result, [path, owners]) => {
+        const filesApproved = [];
+        const filesRequired = [];
+        let ownersRequired = [];
+
+        Object.entries(ownersMap).forEach(([file, owners]) => {
             const ownedFile = owners.some((owner) => approvers.includes(owner));
 
             if (ownedFile) {
-                result.push(path);
+                filesApproved.push(file);
+            } else {
+                filesRequired.push(file);
+                ownersRequired.push(...owners);
             }
-
-            return result;
-        }, []);
-
-        const filesWhichStillNeedApproval = changedFiles.filter((file) => {
-            return !allApprovedFiles.includes(file);
         });
 
-        const approvedByTheCurrentUser = latestUserReviewMap[user] && latestUserReviewMap[user].state === ReviewStates.APPROVED;
+        ownersRequired = [...new Set(ownersRequired)];
 
-        if (filesWhichStillNeedApproval.length > 0) {
+        const approvedByTheCurrentUser = latestUserReviewMap[user] && latestUserReviewMap[user].state === ReviewStates.APPROVED;
+        const requiredApprovalComment = utils.createRequiredApprovalsComment(ownersMap, filesRequired, PATH_PREFIX);
+
+        if (filesRequired.length > 0) {
             core.warning('No sufficient approvals can\'t approve the pull-request');
-            core.info(utils.createRequiredApprovalsComment(ownersMap, filesWhichStillNeedApproval, PATH_PREFIX));
+            core.info(requiredApprovalComment);
 
             if (approvedByTheCurrentUser) {
                 // Dismiss
@@ -230,6 +250,8 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
                 body: '',
             });
         }
+
+        await updateBody(ownersRequired, requiredApprovalComment);
     };
 
     /**

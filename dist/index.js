@@ -26988,6 +26988,80 @@ module.exports = {createRequiredApprovalsComment};
 
 /***/ }),
 
+/***/ 9526:
+/***/ ((module) => {
+
+const REVIEWERS_BLOCK_START = '<!-- reviewers start -->';
+const REVIEWERS_BLOCK_END = '<!-- reviewers end -->';
+
+const BLOCK_REGEX = new RegExp(`${REVIEWERS_BLOCK_START}(.|\r\n|\n)*${REVIEWERS_BLOCK_END}`);
+
+/**
+ * @param {string} body
+ * @param {string} comment
+ * @returns {boolean}
+ */
+const sameComment = (body, comment) => {
+    const matchedBlock = body.match(BLOCK_REGEX);
+
+    if(!matchedBlock) {
+        return false;
+    }
+
+    return (matchedBlock[0] === comment);
+}
+
+/**
+ * @param {string[]} owners
+ * @param {string} requiredApproval
+ * @returns {string}
+ */
+const createCommentBlock = (owners, requiredApproval) => {
+    if(!owners.length) {
+        return REVIEWERS_BLOCK_START + REVIEWERS_BLOCK_END;
+    }
+
+    return (
+        REVIEWERS_BLOCK_START
+        + '\n'
+        + '### Reviewers'
+        + '\n\n'
+        + `Needs to be approved by: ${owners.map(owner => `@${owner}`).join(', ')}`
+        + '<details>'
+        + '<summary>Details</summary>'
+        + '\n'
+        + requiredApproval
+        + '</details>'
+        + REVIEWERS_BLOCK_END
+    );
+};
+
+/**
+ * @param {string} currentBody
+ * @param {string[]} owners
+ * @param {string} requiredApproval
+ * @returns {string}
+ */
+const createUpdatedBody = (currentBody, owners, requiredApproval) => {
+    const body = currentBody || '';
+    const comment = createCommentBlock(owners, requiredApproval);
+
+    if(sameComment(body, comment)) {
+        return body;
+    }
+
+    if(BLOCK_REGEX.test(body)) {
+        return body.replace(BLOCK_REGEX, comment);
+    }
+
+    return body + '\n\n' + comment;
+};
+
+module.exports = {createUpdatedBody};
+
+
+/***/ }),
+
 /***/ 3730:
 /***/ ((module) => {
 
@@ -27271,8 +27345,9 @@ module.exports = {getRegex};
 /***/ 2070:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const {createRequiredApprovalsComment} = __nccwpck_require__(2953);
 const {createOwnersMap} = __nccwpck_require__(7561);
+const {createRequiredApprovalsComment} = __nccwpck_require__(2953);
+const {createUpdatedBody} = __nccwpck_require__(9526);
 const {filterChangedFiles} = __nccwpck_require__(3730);
 const {getListReviewers} = __nccwpck_require__(8107);
 const {getLatestUserReviewMap} = __nccwpck_require__(8731);
@@ -27282,8 +27357,9 @@ const {getOwners} = __nccwpck_require__(6425);
 const {validateLabelsMap} = __nccwpck_require__(3848);
 
 module.exports = {
-    createRequiredApprovalsComment,
     createOwnersMap,
+    createRequiredApprovalsComment,
+    createUpdatedBody,
     filterChangedFiles,
     getListReviewers,
     getLatestUserReviewMap,
@@ -27721,6 +27797,22 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     };
 
     /**
+     *
+     * @param {string[]} owners
+     * @param {string} requiredApproval
+     */
+    const updateBody = async (owners, requiredApproval) => {
+        const updatedBody = utils.createUpdatedBody(pull_request.body, owners, requiredApproval);
+
+        await octokit.rest.pulls.update({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            pull_number,
+            body: updatedBody,
+        });
+    };
+
+    /**
      * @param {$Reviewers.OwnersMap} ownersMap
      * @param {$Reviewers.LatestUserReviewMap} latestUserReviewMap
      * @param {string[]} changedFiles
@@ -27731,25 +27823,29 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
             return latestUserReviewMap[reviewer].state === ReviewStates.APPROVED;
         });
 
-        const allApprovedFiles = Object.entries(ownersMap).reduce((result, [path, owners]) => {
+        const filesApproved = [];
+        const filesRequired = [];
+        let ownersRequired = [];
+
+        Object.entries(ownersMap).forEach(([file, owners]) => {
             const ownedFile = owners.some((owner) => approvers.includes(owner));
 
             if (ownedFile) {
-                result.push(path);
+                filesApproved.push(file);
+            } else {
+                filesRequired.push(file);
+                ownersRequired.push(...owners);
             }
-
-            return result;
-        }, []);
-
-        const filesWhichStillNeedApproval = changedFiles.filter((file) => {
-            return !allApprovedFiles.includes(file);
         });
 
-        const approvedByTheCurrentUser = latestUserReviewMap[user] && latestUserReviewMap[user].state === ReviewStates.APPROVED;
+        ownersRequired = [...new Set(ownersRequired)];
 
-        if (filesWhichStillNeedApproval.length > 0) {
+        const approvedByTheCurrentUser = latestUserReviewMap[user] && latestUserReviewMap[user].state === ReviewStates.APPROVED;
+        const requiredApprovalComment = utils.createRequiredApprovalsComment(ownersMap, filesRequired, PATH_PREFIX);
+
+        if (filesRequired.length > 0) {
             core.warning('No sufficient approvals can\'t approve the pull-request');
-            core.info(utils.createRequiredApprovalsComment(ownersMap, filesWhichStillNeedApproval, PATH_PREFIX));
+            core.info(requiredApprovalComment);
 
             if (approvedByTheCurrentUser) {
                 // Dismiss
@@ -27769,6 +27865,8 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
                 body: '',
             });
         }
+
+        await updateBody(ownersRequired, requiredApprovalComment);
     };
 
     /**
