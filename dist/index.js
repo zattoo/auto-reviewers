@@ -26930,16 +26930,17 @@ const createOwnersFileMap = async (changedFiles, filename, regex) => {
  * @param {string[]} changedFiles
  * @param {string} filename
  * @param {RegExp} regex
+ * @param {string} creator
  * @returns {Promise<$Reviewers.OwnersMap>}
  */
-const createOwnersMap = async (changedFiles, filename, regex) => {
+const createOwnersMap = async (changedFiles, filename, regex, creator) => {
     const ownersFileMap = await createOwnersFileMap(changedFiles, filename, regex);
 
     const fileQueue = Object.entries(ownersFileMap).map(async ([ownersFile, changedFilesList]) => {
-        const ownersData = await readFile(ownersFile);
+        const owners = (await readFile(ownersFile)).filter((owner) => owner !== creator);
 
         return {
-            owners: ownersData,
+            owners,
             changedFilesList,
         };
     });
@@ -27898,8 +27899,9 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
 
     const latestUserReviewMap = utils.getLatestUserReviewMap(listReviews);
     const filteredChangedFiles = utils.filterChangedFiles(changedFiles, ignoreFiles);
-    const ownersMap = await utils.createOwnersMap(filteredChangedFiles, ownersFilename, utils.getRegex(level, PATH_PREFIX));
-    const codeowners = await utils.getOwners(ownersMap, path.join(PATH_PREFIX, ownersFilename), pull_request.user.login);
+    const creator = pull_request.user.login;
+    const ownersMap = await utils.createOwnersMap(filteredChangedFiles, ownersFilename, utils.getRegex(level, PATH_PREFIX), creator);
+    const codeowners = await utils.getOwners(ownersMap, path.join(PATH_PREFIX, ownersFilename), creator);
 
     core.info(`level is: ${level}`);
 
