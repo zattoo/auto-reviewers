@@ -27081,6 +27081,8 @@ const createUpdatedBody = (currentBody, owners, requiredApprovalMap) => {
     const body = currentBody || '';
     const comment = createCommentBlock(owners, requiredApprovalMap);
 
+    console.log(comment);
+
     if(sameComment(body, comment)) {
         return body;
     }
