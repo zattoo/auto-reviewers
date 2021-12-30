@@ -27035,6 +27035,38 @@ const sameComment = (body, comment) => {
 }
 
 /**
+ * Create table with all required files and owners
+ * If the amount of files exceeded 1000 we don't show table
+ * since PR body can't contain it
+ *
+ * @param {$Reviewers.OwnersMap} requiredApprovalMap
+ * @param {number} length
+ * @returns {string}
+ */
+const createTable = (requiredApprovalMap, length) => {
+    if(length > 2000) {
+        return '';
+    }
+
+    const data = Object.entries(requiredApprovalMap).map(([file, owners]) => {
+        return `| \`${file}\` | ${owners.join(', ')} |\n`;
+    }).join('');
+
+    return (
+        '<details>'
+        + '\n'
+        + '<summary>Details</summary>'
+        + '\n\n'
+        + '| File | Owners |\n| :--- | :--- |'
+        + '\n'
+        + data
+        + '\n\n'
+        + '</details>'
+        + '\n'
+    )
+};
+
+/**
  * @param {string[]} owners
  * @param {$Reviewers.OwnersMap} requiredApprovalMap
  * @returns {string}
@@ -27044,30 +27076,19 @@ const createCommentBlock = (owners, requiredApprovalMap) => {
         return REVIEWERS_BLOCK_START + REVIEWERS_BLOCK_END;
     }
 
-    const HEADING = '| File | Owners |\n| :--- | :--- |\n';
-
     const files = Object.keys(requiredApprovalMap);
-
-    const data = files.map((file) => {
-        return `| \`${file}\` | ${requiredApprovalMap[file].join(', ')} |\n`;
-    }).join('');
+    const filesLength = files.length;
+    const description = `${filesLength} ${filesLength > 1 ? 'files' : 'file'} needs to be approved by: ${owners.map(owner => `@${owner}`).join(', ')}`;
+    const table = createTable(requiredApprovalMap, filesLength);
 
     return (
         REVIEWERS_BLOCK_START
         + '\n'
         + '## Reviewers'
         + '\n\n'
-        + `${files.length} files needs to be approved by: ${owners.map(owner => `@${owner}`).join(', ')}`
+        + description
         + '\n'
-        + '<details>'
-        + '\n'
-        + '<summary>Details</summary>'
-        + '\n\n'
-        + HEADING
-        + data
-        + '\n\n'
-        + '</details>'
-        + '\n'
+        + table
         + REVIEWERS_BLOCK_END
         + '\n'
     );
