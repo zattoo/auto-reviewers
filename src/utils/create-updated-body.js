@@ -28,7 +28,7 @@ const sameComment = (body, comment) => {
  * @returns {string}
  */
 const createTable = (requiredApprovalMap, length) => {
-    if(length > 2000) {
+    if(length > 4000) {
         return '';
     }
 
