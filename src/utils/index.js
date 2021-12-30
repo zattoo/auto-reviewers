@@ -1,5 +1,6 @@
 const {createOwnersMap} = require('./create-owners-map');
 const {createRequiredApprovalsComment} = require('./create-required-approval-comment');
+const {createRequiredApprovalsMap} = require('./create-required-approval-map');
 const {createUpdatedBody} = require('./create-updated-body');
 const {filterChangedFiles} = require('./filter-changed-files');
 const {getListReviewers} = require('./get-list-reviewers');
@@ -12,6 +13,7 @@ const {validateLabelsMap} = require('./validate-labels-map');
 module.exports = {
     createOwnersMap,
     createRequiredApprovalsComment,
+    createRequiredApprovalsMap,
     createUpdatedBody,
     filterChangedFiles,
     getListReviewers,

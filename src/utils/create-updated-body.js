@@ -20,13 +20,19 @@ const sameComment = (body, comment) => {
 
 /**
  * @param {string[]} owners
- * @param {string} requiredApproval
+ * @param {$Reviewers.OwnersMap} requiredApprovalMap
  * @returns {string}
  */
-const createCommentBlock = (owners, requiredApproval) => {
+const createCommentBlock = (owners, requiredApprovalMap) => {
     if(!owners.length) {
         return REVIEWERS_BLOCK_START + REVIEWERS_BLOCK_END;
     }
+
+    const HEADING = '| File | Owners |\n| :--- | :--- |\n';
+
+    const data = Object.entries(requiredApprovalMap).map(([file, owners]) => {
+        return `| \`${file}\` | ${owners.join(', ')} |\n`;
+    });
 
     return (
         REVIEWERS_BLOCK_START
@@ -39,7 +45,8 @@ const createCommentBlock = (owners, requiredApproval) => {
         + '\n'
         + '<summary>Details</summary>'
         + '\n\n'
-        + requiredApproval
+        + HEADING
+        + data
         + '\n\n'
         + '</details>'
         + '\n'
@@ -51,12 +58,12 @@ const createCommentBlock = (owners, requiredApproval) => {
 /**
  * @param {string} currentBody
  * @param {string[]} owners
- * @param {string} requiredApproval
+ * @param {$Reviewers.OwnersMap} requiredApprovalMap
  * @returns {string}
  */
-const createUpdatedBody = (currentBody, owners, requiredApproval) => {
+const createUpdatedBody = (currentBody, owners, requiredApprovalMap) => {
     const body = currentBody || '';
-    const comment = createCommentBlock(owners, requiredApproval);
+    const comment = createCommentBlock(owners, requiredApprovalMap);
 
     if(sameComment(body, comment)) {
         return body;
@@ -66,7 +73,7 @@ const createUpdatedBody = (currentBody, owners, requiredApproval) => {
         return body.replace(BLOCK_REGEX, comment);
     }
 
-    return body + '\n\n' + comment;
+    return body + comment;
 };
 
 module.exports = {createUpdatedBody};
