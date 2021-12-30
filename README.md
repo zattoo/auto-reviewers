@@ -28,6 +28,32 @@ Optional. list of files which the action should ignore when assigning reviewers,
 
 Optional. Record, with `label` keys and glob path values. If a specified label is added to a PR, the action will assign reviewers according to the map.
 
+## Where to see Information
+
+The action provides information regarding which files needs to be approved and who are the codeowners of each file
+The information is updated everytime the action runs automatically
+It can be found in the Pull Request description as well as in the Workflow logs
+In the Pull Request description if the amount of files exceeded 500 the action won't show specific details for each file
+
+### Example:
+
+```
+<!-- reviewers start -->
+## Reviewers
+
+2 files needs to be approved by: @not-a-user, @another-user
+<details>
+<summary>Details</summary>
+
+| File | Owners |
+| :--- | :--- |
+| `src/index.jsx` | not-a-user |
+| `.github/workflows/reviewers.yml` | not-a-user, another-user|
+
+</details>
+<!-- reviewers end -->
+```
+
 ## Usage
 
 ### Metadata file
