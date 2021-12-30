@@ -26971,20 +26971,42 @@ module.exports = {createOwnersMap};
 /***/ ((module) => {
 
 /**
- * @param {$Reviewers.OwnersMap} ownersMap
- * @param {string[]} filesWhichRequireApproval
- * @param {string} pathPrefix
+ * @param {$Reviewers.OwnersMap} requiredApprovalMap
  */
-const createRequiredApprovalsComment = (ownersMap, filesWhichRequireApproval, pathPrefix) => {
-    const filesMap = filesWhichRequireApproval.map((file) => {
-        return `- ${file.substr(pathPrefix.length + 1)} (${ownersMap[file].join(', ')})`;
+const createRequiredApprovalsComment = (requiredApprovalMap) => {
+    const files = Object.keys(requiredApprovalMap);
+
+    const filesMap = files.map((file) => {
+        return `- ${file} (${requiredApprovalMap[file].join(', ')})`;
     }).join('\n');
 
-    return (`Approval is still required for ${filesWhichRequireApproval.length} files\n${filesMap}`);
+    return (`Approval is still required for ${files.length} files\n${filesMap}`);
 };
 
 module.exports = {createRequiredApprovalsComment};
 
+
+
+/***/ }),
+
+/***/ 6213:
+/***/ ((module) => {
+
+/**
+ * @param {$Reviewers.OwnersMap} ownersMap
+ * @param {string[]} filesWhichRequireApproval
+ * @param {string} pathPrefix
+ * @returns {$Reviewers.OwnersMap}
+ */
+const createRequiredApprovalsMap = (ownersMap, filesWhichRequireApproval, pathPrefix) => {
+    return filesWhichRequireApproval.reduce((map, file) => {
+        map[file.substr(pathPrefix.length + 1)] = ownersMap[file];
+
+        return map;
+    }, {});
+}
+
+module.exports = {createRequiredApprovalsMap};
 
 
 /***/ }),
@@ -27013,43 +27035,73 @@ const sameComment = (body, comment) => {
 }
 
 /**
- * @param {string[]} owners
- * @param {string} requiredApproval
+ * Create table with all required files and owners
+ * If the amount of files exceeded 500 we don't show table
+ *
+ * @param {$Reviewers.OwnersMap} requiredApprovalMap
+ * @param {number} length
  * @returns {string}
  */
-const createCommentBlock = (owners, requiredApproval) => {
+const createTable = (requiredApprovalMap, length) => {
+    if(length > 500) {
+        return '';
+    }
+
+    const data = Object.entries(requiredApprovalMap).map(([file, owners]) => {
+        return `| \`${file}\` | ${owners.join(', ')} |\n`;
+    }).join('');
+
+    return (
+        '<details>'
+        + '\n'
+        + '<summary>Details</summary>'
+        + '\n\n'
+        + '| File | Owners |\n| :--- | :--- |'
+        + '\n'
+        + data
+        + '\n\n'
+        + '</details>'
+        + '\n'
+    )
+};
+
+/**
+ * @param {string[]} owners
+ * @param {$Reviewers.OwnersMap} requiredApprovalMap
+ * @returns {string}
+ */
+const createCommentBlock = (owners, requiredApprovalMap) => {
     if(!owners.length) {
         return REVIEWERS_BLOCK_START + REVIEWERS_BLOCK_END;
     }
 
+    const files = Object.keys(requiredApprovalMap);
+    const filesLength = files.length;
+    const description = `${filesLength} ${filesLength > 1 ? 'files' : 'file'} needs to be approved by: ${owners.map(owner => `@${owner}`).join(', ')}`;
+    const table = createTable(requiredApprovalMap, filesLength);
+
     return (
         REVIEWERS_BLOCK_START
         + '\n'
-        + '### Reviewers'
+        + '## Reviewers'
         + '\n\n'
-        + `Needs to be approved by: ${owners.map(owner => `@${owner}`).join(', ')}`
+        + description
         + '\n'
-        + '<details>'
-        + '\n'
-        + '<summary>Details</summary>'
-        + '\n\n'
-        + requiredApproval
-        + '\n\n'
-        + '</details>'
-        + '\n'
+        + table
         + REVIEWERS_BLOCK_END
+        + '\n'
     );
 };
 
 /**
  * @param {string} currentBody
  * @param {string[]} owners
- * @param {string} requiredApproval
+ * @param {$Reviewers.OwnersMap} requiredApprovalMap
  * @returns {string}
  */
-const createUpdatedBody = (currentBody, owners, requiredApproval) => {
+const createUpdatedBody = (currentBody, owners, requiredApprovalMap) => {
     const body = currentBody || '';
-    const comment = createCommentBlock(owners, requiredApproval);
+    const comment = createCommentBlock(owners, requiredApprovalMap);
 
     if(sameComment(body, comment)) {
         return body;
@@ -27059,7 +27111,7 @@ const createUpdatedBody = (currentBody, owners, requiredApproval) => {
         return body.replace(BLOCK_REGEX, comment);
     }
 
-    return body + '\n\n' + comment;
+    return body + comment;
 };
 
 module.exports = {createUpdatedBody};
@@ -27352,6 +27404,7 @@ module.exports = {getRegex};
 
 const {createOwnersMap} = __nccwpck_require__(7561);
 const {createRequiredApprovalsComment} = __nccwpck_require__(2953);
+const {createRequiredApprovalsMap} = __nccwpck_require__(6213);
 const {createUpdatedBody} = __nccwpck_require__(9526);
 const {filterChangedFiles} = __nccwpck_require__(3730);
 const {getListReviewers} = __nccwpck_require__(8107);
@@ -27364,6 +27417,7 @@ const {validateLabelsMap} = __nccwpck_require__(3848);
 module.exports = {
     createOwnersMap,
     createRequiredApprovalsComment,
+    createRequiredApprovalsMap,
     createUpdatedBody,
     filterChangedFiles,
     getListReviewers,
@@ -27804,10 +27858,10 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     /**
      *
      * @param {string[]} owners
-     * @param {string} requiredApproval
+     * @param {$Reviewers.OwnersMap} requiredApprovalMap
      */
-    const updateBody = async (owners, requiredApproval) => {
-        const updatedBody = utils.createUpdatedBody(pull_request.body, owners, requiredApproval);
+    const updateBody = async (owners, requiredApprovalMap) => {
+        const updatedBody = utils.createUpdatedBody(pull_request.body, owners, requiredApprovalMap);
 
         await octokit.rest.pulls.update({
             owner: context.repo.owner,
@@ -27842,7 +27896,8 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         ownersRequired = [...new Set(ownersRequired)];
 
         const approvedByTheCurrentUser = latestUserReviewMap[user] && latestUserReviewMap[user].state === ReviewStates.APPROVED;
-        const requiredApprovalComment = utils.createRequiredApprovalsComment(ownersMap, filesRequired, PATH_PREFIX);
+        const requiredApprovalMap = utils.createRequiredApprovalsMap(ownersMap, filesRequired, PATH_PREFIX);
+        const requiredApprovalComment = utils.createRequiredApprovalsComment(requiredApprovalMap);
 
         if (filesRequired.length > 0) {
             core.warning('No sufficient approvals can\'t approve the pull-request');
@@ -27867,7 +27922,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
             });
         }
 
-        await updateBody(ownersRequired, requiredApprovalComment);
+        await updateBody(ownersRequired, requiredApprovalMap);
     };
 
     /**

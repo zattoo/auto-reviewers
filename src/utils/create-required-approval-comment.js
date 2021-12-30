@@ -1,14 +1,14 @@
 /**
- * @param {$Reviewers.OwnersMap} ownersMap
- * @param {string[]} filesWhichRequireApproval
- * @param {string} pathPrefix
+ * @param {$Reviewers.OwnersMap} requiredApprovalMap
  */
-const createRequiredApprovalsComment = (ownersMap, filesWhichRequireApproval, pathPrefix) => {
-    const filesMap = filesWhichRequireApproval.map((file) => {
-        return `- ${file.substr(pathPrefix.length + 1)} (${ownersMap[file].join(', ')})`;
+const createRequiredApprovalsComment = (requiredApprovalMap) => {
+    const files = Object.keys(requiredApprovalMap);
+
+    const filesMap = files.map((file) => {
+        return `- ${file} (${requiredApprovalMap[file].join(', ')})`;
     }).join('\n');
 
-    return (`Approval is still required for ${filesWhichRequireApproval.length} files\n${filesMap}`);
+    return (`Approval is still required for ${files.length} files\n${filesMap}`);
 };
 
 module.exports = {createRequiredApprovalsComment};

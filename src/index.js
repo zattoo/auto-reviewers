@@ -184,10 +184,10 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     /**
      *
      * @param {string[]} owners
-     * @param {string} requiredApproval
+     * @param {$Reviewers.OwnersMap} requiredApprovalMap
      */
-    const updateBody = async (owners, requiredApproval) => {
-        const updatedBody = utils.createUpdatedBody(pull_request.body, owners, requiredApproval);
+    const updateBody = async (owners, requiredApprovalMap) => {
+        const updatedBody = utils.createUpdatedBody(pull_request.body, owners, requiredApprovalMap);
 
         await octokit.rest.pulls.update({
             owner: context.repo.owner,
@@ -222,7 +222,8 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         ownersRequired = [...new Set(ownersRequired)];
 
         const approvedByTheCurrentUser = latestUserReviewMap[user] && latestUserReviewMap[user].state === ReviewStates.APPROVED;
-        const requiredApprovalComment = utils.createRequiredApprovalsComment(ownersMap, filesRequired, PATH_PREFIX);
+        const requiredApprovalMap = utils.createRequiredApprovalsMap(ownersMap, filesRequired, PATH_PREFIX);
+        const requiredApprovalComment = utils.createRequiredApprovalsComment(requiredApprovalMap);
 
         if (filesRequired.length > 0) {
             core.warning('No sufficient approvals can\'t approve the pull-request');
@@ -247,7 +248,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
             });
         }
 
-        await updateBody(ownersRequired, requiredApprovalComment);
+        await updateBody(ownersRequired, requiredApprovalMap);
     };
 
     /**
