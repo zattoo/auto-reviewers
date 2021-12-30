@@ -30,8 +30,8 @@ const createCommentBlock = (owners, requiredApprovalMap) => {
 
     const HEADING = '| File | Owners |\n| :--- | :--- |\n';
 
-    const data = Object.entries(requiredApprovalMap).map(([file, owners]) => {
-        return `| \`${file}\` | ${owners.join(', ')} |\n`;
+    const data = Object.entries(requiredApprovalMap).map(([file, fileOwners]) => {
+        return `| \`${file}\` | ${fileOwners.join(', ')} |\n`;
     });
 
     return (
