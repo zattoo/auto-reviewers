@@ -27036,15 +27036,14 @@ const sameComment = (body, comment) => {
 
 /**
  * Create table with all required files and owners
- * If the amount of files exceeded 1000 we don't show table
- * since PR body can't contain it
+ * If the amount of files exceeded 500 we don't show table
  *
  * @param {$Reviewers.OwnersMap} requiredApprovalMap
  * @param {number} length
  * @returns {string}
  */
 const createTable = (requiredApprovalMap, length) => {
-    if(length > 2000) {
+    if(length > 500) {
         return '';
     }
 
