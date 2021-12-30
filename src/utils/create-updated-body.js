@@ -31,8 +31,8 @@ const createCommentBlock = (owners, requiredApprovalMap) => {
     const HEADING = '| File | Owners |\n| :--- | :--- |\n';
 
     const data = Object.entries(requiredApprovalMap).map(([file, fileOwners]) => {
-        return `| \`${file}\` | ${fileOwners} |\n`;
-    });
+        return `| \`${file}\` | ${fileOwners.join(', ')} |\n`;
+    }).join('');
 
     return (
         REVIEWERS_BLOCK_START
@@ -64,8 +64,6 @@ const createCommentBlock = (owners, requiredApprovalMap) => {
 const createUpdatedBody = (currentBody, owners, requiredApprovalMap) => {
     const body = currentBody || '';
     const comment = createCommentBlock(owners, requiredApprovalMap);
-
-    console.log(comment);
 
     if(sameComment(body, comment)) {
         return body;
