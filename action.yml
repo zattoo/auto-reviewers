@@ -11,7 +11,7 @@ inputs:
     description: 'GitHub token'
     required: true
   labels:
-    description: 'Record, with `label` keys and glob path values.'
+    description: 'Record, with `label` keys and regex path values.'
     required: false
 runs:
   using: 'node12'

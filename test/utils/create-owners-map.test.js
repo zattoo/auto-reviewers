@@ -28,7 +28,7 @@ describe(createOwnersMap.name, () => {
             [`${PATH_REPO}/projects/app/src/features/example.js`]: ['victor', 'nitzanashi', 'kimc0de'],
         };
 
-        expect(await createOwnersMap(changedFiles, '.owners', getRegex('**/projects/*', ''))).toEqual(ownersMap);
+        expect(await createOwnersMap(changedFiles, '.owners', getRegex('projects/.*', ''))).toEqual(ownersMap);
     });
 
     it('returns the expected map for root level', async () => {

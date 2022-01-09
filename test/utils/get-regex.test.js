@@ -6,6 +6,6 @@ describe(getRegex.name, () => {
    });
 
    it('returns regex for a level', () => {
-      expect(getRegex('**/projects/*', '/home')).toEqual(/\/home\/((?:[^/]*(?:\/|$))*)projects\/([^/]*)/gi);
+      expect(getRegex('(projects|tv-clients)/.*', '/home')).toEqual( /\/home\/(projects|tv-clients)\/.*/);
    });
 });
