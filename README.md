@@ -26,7 +26,7 @@ Optional. list of files which the action should ignore when assigning reviewers,
 
 `JSON string`
 
-Optional. Record, with `label` keys and glob path values. If a specified label is added to a PR, the action will assign reviewers according to the map.
+Optional. Record, with `label` keys and regex path values. If a specified label is added to a PR, the action will assign reviewers according to the map.
 
 ## Where to see Information
 
