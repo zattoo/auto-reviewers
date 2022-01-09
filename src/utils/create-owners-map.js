@@ -10,8 +10,12 @@ const {readFile} = require('./read-file');
 const createOwnersFileMap = async (changedFiles, filename, regex) => {
     const ownersFileMap = {};
 
+    console.log(regex);
+
     const ownersFilesQueue = changedFiles.map(async (filePath) => {
         const ownerFiles = await findNearestFiles(filename, filePath, regex);
+
+        console.log(filePath, ownerFiles);
 
         ownerFiles.forEach((ownerFile) => {
             if (!ownersFileMap[ownerFile]) {
