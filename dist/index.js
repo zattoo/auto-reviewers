@@ -26772,12 +26772,8 @@ const {readFile} = __nccwpck_require__(8452);
 const createOwnersFileMap = async (changedFiles, filename, regex) => {
     const ownersFileMap = {};
 
-    console.log(regex);
-
     const ownersFilesQueue = changedFiles.map(async (filePath) => {
         const ownerFiles = await findNearestFiles(filename, filePath, regex);
-
-        console.log(filePath, ownerFiles);
 
         ownerFiles.forEach((ownerFile) => {
             if (!ownersFileMap[ownerFile]) {
