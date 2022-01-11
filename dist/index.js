@@ -26880,7 +26880,7 @@ module.exports = {createRequiredApprovalsMap};
 const REVIEWERS_BLOCK_START = '<!-- reviewers start -->';
 const REVIEWERS_BLOCK_END = '<!-- reviewers end -->';
 
-const BLOCK_REGEX = new RegExp(`(\\n)*(\s)*${REVIEWERS_BLOCK_START}(.|\r\n|\n)*${REVIEWERS_BLOCK_END}(s)*(\\n)*`);
+const BLOCK_REGEX = new RegExp(`(\\n)*(\\s)*${REVIEWERS_BLOCK_START}(.|\r\n|\n)*${REVIEWERS_BLOCK_END}(\\s)*(\\n)*`);
 
 /**
  * @param {string} body
