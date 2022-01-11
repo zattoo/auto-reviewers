@@ -65,7 +65,7 @@ const createCommentBlock = (owners, requiredApprovalMap) => {
     const table = createTable(requiredApprovalMap, filesLength);
 
     return (
-        '\n'
+        '\n\n'
         + REVIEWERS_BLOCK_START
         + '\n'
         + '## Reviewers'
@@ -74,7 +74,7 @@ const createCommentBlock = (owners, requiredApprovalMap) => {
         + '\n'
         + table
         + REVIEWERS_BLOCK_END
-        + '\n'
+        + '\n\n'
     );
 };
 
