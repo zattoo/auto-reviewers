@@ -5,7 +5,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
-- Clean before and after linebreaks in PR description
+Clean before and after linebreaks in PR description
 
 ## [4.0.0] - 09.01.2022
 
