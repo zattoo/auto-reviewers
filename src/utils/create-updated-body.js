@@ -1,7 +1,7 @@
 const REVIEWERS_BLOCK_START = '<!-- reviewers start -->';
 const REVIEWERS_BLOCK_END = '<!-- reviewers end -->';
 
-const BLOCK_REGEX = new RegExp(`${REVIEWERS_BLOCK_START}(.|\r\n|\n)*${REVIEWERS_BLOCK_END}`);
+const BLOCK_REGEX = new RegExp(`(\\n)*(\s)*${REVIEWERS_BLOCK_START}(.|\r\n|\n)*${REVIEWERS_BLOCK_END}(s)*(\\n)*`);
 
 /**
  * @param {string} body
@@ -55,8 +55,8 @@ const createTable = (requiredApprovalMap, length) => {
  * @returns {string}
  */
 const createCommentBlock = (owners, requiredApprovalMap) => {
-    if(!owners.length) {
-        return REVIEWERS_BLOCK_START + REVIEWERS_BLOCK_END;
+    if (!owners.length) {
+        return '';
     }
 
     const files = Object.keys(requiredApprovalMap);
@@ -65,7 +65,8 @@ const createCommentBlock = (owners, requiredApprovalMap) => {
     const table = createTable(requiredApprovalMap, filesLength);
 
     return (
-        REVIEWERS_BLOCK_START
+        '\n'
+        + REVIEWERS_BLOCK_START
         + '\n'
         + '## Reviewers'
         + '\n\n'
@@ -87,11 +88,11 @@ const createUpdatedBody = (currentBody, owners, requiredApprovalMap) => {
     const body = currentBody || '';
     const comment = createCommentBlock(owners, requiredApprovalMap);
 
-    if(sameComment(body, comment)) {
+    if (sameComment(body, comment)) {
         return body;
     }
 
-    if(BLOCK_REGEX.test(body)) {
+    if (BLOCK_REGEX.test(body)) {
         return body.replace(BLOCK_REGEX, comment);
     }
 
