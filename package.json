@@ -33,7 +33,7 @@
         "parse-link-header": "1.0.1"
     },
     "devDependencies": {
-        "@octokit/types": "6.34.0",
+        "@octokit/types": "6.35.0",
         "@types/fs-extra": "9.0.13",
         "@vercel/ncc": "0.33.4",
         "eslint": "8.18.0",
