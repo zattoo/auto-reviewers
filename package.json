@@ -34,7 +34,7 @@
     },
     "devDependencies": {
         "@octokit/types": "8.0.0",
-        "@types/fs-extra": "9.0.13",
+        "@types/fs-extra": "11.0.0",
         "@vercel/ncc": "0.36.0",
         "eslint": "8.31.0",
         "jest": "29.3.1"
