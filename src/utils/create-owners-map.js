@@ -1,17 +1,18 @@
-const {findNearestFiles} = require('./find-nearest-files');
+const {findOwnerFiles} = require('./find-owner-files');
 const {readFile} = require('./read-file');
 
 /**
  * @param {string[]} changedFiles
  * @param {string} filename
  * @param {RegExp} regex
+ * @param {string} ownersPath
  * @returns {Promise<Record<string, string[]>>}
  */
-const createOwnersFileMap = async (changedFiles, filename, regex) => {
+const createOwnersFileMap = async (changedFiles, filename, regex, ownersPath) => {
     const ownersFileMap = {};
 
     const ownersFilesQueue = changedFiles.map(async (filePath) => {
-        const ownerFiles = await findNearestFiles(filename, filePath, regex);
+       const ownerFiles = await findOwnerFiles(filename, filePath, regex, ownersPath);
 
         ownerFiles.forEach((ownerFile) => {
             if (!ownersFileMap[ownerFile]) {
@@ -32,10 +33,11 @@ const createOwnersFileMap = async (changedFiles, filename, regex) => {
  * @param {string} filename
  * @param {RegExp} regex
  * @param {string} creator
+ * @param {string} projectOwnersPath
  * @returns {Promise<$Reviewers.OwnersMap>}
  */
-const createOwnersMap = async (changedFiles, filename, regex, creator) => {
-    const ownersFileMap = await createOwnersFileMap(changedFiles, filename, regex);
+const createOwnersMap = async (changedFiles, filename, regex, creator, projectOwnersPath) => {
+    const ownersFileMap = await createOwnersFileMap(changedFiles, filename, regex, projectOwnersPath);
 
     const fileQueue = Object.entries(ownersFileMap).map(async ([ownersFile, changedFilesList]) => {
         const owners = (await readFile(ownersFile)).filter((owner) => owner !== creator);

@@ -21,6 +21,16 @@ describe(createOwnersMap.name, () => {
         expect(await createOwnersMap(changedFiles, '.owners', null)).toEqual(ownersMap);
     });
 
+    it('returns the expected map when theres an owners map param', async () => {
+        /** @type {OwnersMap} */
+        const ownersMap = {
+            [`${PATH_REPO}/.github/workflows/test.yml`]: ['gotbhan', 'jermie', 'bogdan', 'nitzanashi'],
+            [`${PATH_REPO}/projects/app/src/features/example.js`]: ['victor', 'gotbhan', 'jermie'],
+        };
+
+        expect(await createOwnersMap(changedFiles, '.owners', null, null, `${PATH_REPO}/projects/cast`)).toEqual(ownersMap);
+    });
+
     it('returns the expected map for project level', async () => {
         /** @type {OwnersMap} */
         const ownersMap = {

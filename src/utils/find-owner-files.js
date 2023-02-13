@@ -66,9 +66,10 @@ const findFiles = async (filename, directory, regex, foundFiles = []) => {
  * @param {string} filename
  * @param {string} root
  * @param {RegExp} regex
+ * @param {string} projectOwnersPath
  * @returns {Promise<string[]>}
  */
-const findNearestFiles = async (filename, root, regex) => {
+const findOwnerFiles = async (filename, root, regex, projectOwnersPath) => {
     if (!filename) {
         throw new Error('filename is required');
     }
@@ -77,7 +78,25 @@ const findNearestFiles = async (filename, root, regex) => {
         throw new Error('filename must be just a filename and not a path');
     }
 
-    return findFiles(filename, root, regex);
+
+    const files =  await findFiles(filename, root, regex);
+
+
+    if (!projectOwnersPath){
+        return files;
+    }
+
+    const projectOwnersFile = path.join(projectOwnersPath, filename);
+    const fileExists = await fse.pathExists(projectOwnersFile);
+
+    if (fileExists){
+        files.push(projectOwnersFile);
+    }
+    return files;
 };
 
-module.exports = {findNearestFiles}
+
+
+
+
+module.exports = { findOwnerFiles }

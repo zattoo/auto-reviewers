@@ -15,7 +15,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     const ownersFilename = core.getInput('source', {required: true});
     const ignoreFiles = core.getMultilineInput('ignore', {required: true});
     const labelsMap = core.getInput('labels', {required: false});
-
+    const projectOwnersPath = core.getInput('projectOwnersPath', {required: false});
     const octokit = getOctokit(token);
 
     const {repo} = context;
@@ -281,7 +281,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     const latestUserReviewMap = utils.getLatestUserReviewMap(listReviews);
     const filteredChangedFiles = utils.filterChangedFiles(changedFiles, ignoreFiles);
     const creator = pull_request.user.login;
-    const ownersMap = await utils.createOwnersMap(filteredChangedFiles, ownersFilename, utils.getRegex(level, PATH_PREFIX), creator);
+    const ownersMap = await utils.createOwnersMap(filteredChangedFiles, ownersFilename, utils.getRegex(level, PATH_PREFIX), creator, projectOwnersPath);
     const codeowners = await utils.getOwners(ownersMap, path.join(PATH_PREFIX, ownersFilename), creator);
 
     core.info(`level is: ${level}`);
