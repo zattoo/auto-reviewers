@@ -5,14 +5,14 @@ const {readFile} = require('./read-file');
  * @param {string[]} changedFiles
  * @param {string} filename
  * @param {RegExp} regex
- * @param {string} ownersPath
+ * @param {string} projectOwnersPath
  * @returns {Promise<Record<string, string[]>>}
  */
-const createOwnersFileMap = async (changedFiles, filename, regex, ownersPath) => {
+const createOwnersFileMap = async (changedFiles, filename, regex, projectOwnersPath) => {
     const ownersFileMap = {};
 
     const ownersFilesQueue = changedFiles.map(async (filePath) => {
-       const ownerFiles = await findOwnerFiles(filename, filePath, regex, ownersPath);
+       const ownerFiles = await findOwnerFiles(filename, filePath, regex, projectOwnersPath);
 
         ownerFiles.forEach((ownerFile) => {
             if (!ownersFileMap[ownerFile]) {
