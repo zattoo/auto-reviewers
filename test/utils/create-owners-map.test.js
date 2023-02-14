@@ -18,27 +18,39 @@ describe(createOwnersMap.name, () => {
             [`${PATH_REPO}/projects/app/src/features/example.js`]: ['victor'],
         };
 
-        expect(await createOwnersMap(changedFiles, '.owners', null)).toEqual(ownersMap);
+        expect(await createOwnersMap({
+            changedFiles,
+            filename: '.owners'
+        })).toEqual(ownersMap);
     });
 
     it('returns the expected map when theres an owners map param', async () => {
         /** @type {OwnersMap} */
         const ownersMap = {
-            [`${PATH_REPO}/.github/workflows/test.yml`]: ['gotbhan', 'jermie', 'bogdan', 'nitzanashi'],
-            [`${PATH_REPO}/projects/app/src/features/example.js`]: ['victor', 'gotbhan', 'jermie'],
+            [`${PATH_REPO}/.github/workflows/test.yml`]: ['nitzanashi', 'kimc0de'],
+            [`${PATH_REPO}/projects/app/src/features/example.js`]: ['nitzanashi', 'kimc0de'],
         };
 
-        expect(await createOwnersMap(changedFiles, '.owners', null, null, `${PATH_REPO}/projects/cast`)).toEqual(ownersMap);
+        expect(await createOwnersMap({
+            changedFiles,
+            filename: '.owners',
+            projectOwnersPath: `${PATH_REPO}/projects/app`
+        })).toEqual(ownersMap);
     });
 
     it('returns the expected map for project level', async () => {
         /** @type {OwnersMap} */
         const ownersMap = {
-            [`${PATH_REPO}/.github/workflows/test.yml`]: ['bogdan', 'nitzanashi'],
-            [`${PATH_REPO}/projects/app/src/features/example.js`]: ['victor', 'nitzanashi', 'kimc0de'],
+            [`${PATH_REPO}/.github/workflows/test.yml`]: ['nitzanashi', 'kimc0de'],
+            [`${PATH_REPO}/projects/app/src/features/example.js`]: ['nitzanashi', 'kimc0de', 'victor'],
         };
 
-        expect(await createOwnersMap(changedFiles, '.owners', getRegex('projects/.*', ''))).toEqual(ownersMap);
+        expect(await createOwnersMap({
+            changedFiles,
+            filename: '.owners',
+            regex: getRegex('projects/.*', ''),
+            projectOwnersPath: `${PATH_REPO}/projects/app`
+        })).toEqual(ownersMap);
     });
 
     it('returns the expected map for root level', async () => {
@@ -48,7 +60,11 @@ describe(createOwnersMap.name, () => {
             [`${PATH_REPO}/projects/app/src/features/example.js`]: ['bogdan', 'nitzanashi', 'victor', 'kimc0de'],
         };
 
-        expect(await createOwnersMap(changedFiles, '.owners', getRegex('/', ''))).toEqual(ownersMap);
+        expect(await createOwnersMap({
+            changedFiles,
+            filename: '.owners',
+            regex: getRegex('/', '')
+        })).toEqual(ownersMap);
     });
 });
 

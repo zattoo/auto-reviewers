@@ -19,13 +19,38 @@ const nextLevelUp = (directory) => {
 
 /**
  *
+ * @param {string} projectOwnersPath
  * @param {string} filename
- * @param {string} directory
- * @param {RegExp} regex
- * @param {string[]} [foundFiles]
- * @returns {string[]}
+ * @returns {Promise<string>}
  */
-const findFiles = async (filename, directory, regex, foundFiles = []) => {
+const getProjectOwnerFile = async (projectOwnersPath, filename) => {
+    if (!projectOwnersPath) {
+        return null;
+    }
+
+    const projectOwnersFile = path.join(projectOwnersPath, filename);
+    const fileExists = await fse.pathExists(projectOwnersFile);
+
+    if (fileExists) {
+        return projectOwnersFile;
+    }
+
+    return null;
+}
+
+/**
+ * @param {FindFilesOptions} options
+ * @returns {Promise<string[]>}
+ */
+const findFiles = async (options) => {
+
+    const {
+        filename,
+        directory,
+        regex,
+        foundFiles = []
+    } = options;
+
     if (!directory) {
         return foundFiles;
     }
@@ -51,25 +76,36 @@ const findFiles = async (filename, directory, regex, foundFiles = []) => {
     try {
         const fileExists = await fse.pathExists(file);
 
-        if (fileExists) {
+        if (fileExists && !foundFiles.includes(file)) {
             foundFiles.push(file);
         }
 
-        return findFiles(filename, nextDirectory, regex, foundFiles);
+        const options = {
+            filename,
+            directory: nextDirectory,
+            regex,
+            foundFiles
+        };
+
+        return findFiles(options);
     } catch (e) {
-        return findFiles(filename, nextDirectory, regex, foundFiles);
+        return findFiles(options);
     }
 };
 
 /**
- *
- * @param {string} filename
- * @param {string} root
- * @param {RegExp} regex
- * @param {string} projectOwnersPath
+ * @param {FindOwnerFilesOptions} options
  * @returns {Promise<string[]>}
  */
-const findOwnerFiles = async (filename, root, regex, projectOwnersPath) => {
+const findOwnerFiles = async (options) => {
+
+    const {
+        filename,
+        directory,
+        regex,
+        projectOwnersPath
+    } = options;
+
     if (!filename) {
         throw new Error('filename is required');
     }
@@ -79,24 +115,32 @@ const findOwnerFiles = async (filename, root, regex, projectOwnersPath) => {
     }
 
 
-    const files =  await findFiles(filename, root, regex);
+    const foundFiles = [];
+    const projectOwnersFile = await getProjectOwnerFile(projectOwnersPath, filename);
 
-
-    if (!projectOwnersPath){
-        return files;
+    if (projectOwnersFile) {
+        foundFiles.push(projectOwnersFile);
     }
 
-    const projectOwnersFile = path.join(projectOwnersPath, filename);
-    const fileExists = await fse.pathExists(projectOwnersFile);
+    const files =  await findFiles({filename, directory, regex, foundFiles});
 
-    if (fileExists){
-        files.push(projectOwnersFile);
-    }
     return files;
 };
 
-
-
-
-
 module.exports = { findOwnerFiles }
+
+/**
+ * @typedef {Object} FindOwnerFilesOptions
+ * @prop {string} filename
+ * @prop {string} directory
+ * @prop {RegExp} [regex]
+ * @prop {string} [projectOwnersPath]
+ */
+
+/**
+ * @typedef {Object} FindFilesOptions
+ * @prop {string} filename
+ * @prop {string} directory
+ * @prop {RegExp} [regex]
+ * @prop {string[]} [foundFiles]
+ */

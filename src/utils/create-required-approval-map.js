@@ -5,7 +5,10 @@
  * @returns {$Reviewers.OwnersMap}
  */
 const createRequiredApprovalsMap = (ownersMap, filesWhichRequireApproval, pathPrefix) => {
-    return filesWhichRequireApproval.reduce((map, file) => {
+    return filesWhichRequireApproval.reduce((
+            /** @type {$Reviewers.OwnersMap}*/ map,
+            file
+        ) => {
         map[file.substr(pathPrefix.length + 1)] = ownersMap[file];
 
         return map;
