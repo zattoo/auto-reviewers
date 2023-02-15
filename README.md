@@ -24,6 +24,12 @@ Optional. list of files which the action should ignore when assigning reviewers,
 
 ### `labels`
 
+`string`
+
+Optional. Path to a `source` to fetch reviewers from.
+
+### `owners_path`
+
 `JSON string`
 
 Optional. Record, with `label` keys and regex path values. If a specified label is added to a PR, the action will assign reviewers according to the map.
@@ -101,4 +107,5 @@ In the current example `projects/common/.labels` is the closest one so all the l
                           "reviewers:projects": "**/projects/*",
                           "reviewers:platform": "/"
                         }
+                    path: 'projects/directory-containing-owners'
 ````
