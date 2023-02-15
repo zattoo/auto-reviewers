@@ -32,7 +32,7 @@ Optional. Record, with `label` keys and regex path values. If a specified label 
 
 `string`
 
-Optional. Path to a `source` to fetch reviewers from.
+Optional. Path to a `source` to fetch owners from. When provided, the action will assign the changed files' reviewers from the owners found in this path.
 
 ## Where to see Information
 
