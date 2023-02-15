@@ -35,7 +35,7 @@
     },
     "devDependencies": {
         "@octokit/types": "8.0.0",
-        "@types/fs-extra": "11.0.0",
+        "@types/fs-extra": "11.0.1",
         "@types/jest": "29.4.0",
         "@types/lodash": "4.14.191",
         "@types/parse-link-header": "2.0.1",
