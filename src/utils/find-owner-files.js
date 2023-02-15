@@ -19,16 +19,16 @@ const nextLevelUp = (directory) => {
 
 /**
  *
- * @param {string} projectOwnersPath
+ * @param {string} ownersPath
  * @param {string} filename
  * @returns {Promise<string>}
  */
-const getProjectOwnerFile = async (projectOwnersPath, filename) => {
-    if (!projectOwnersPath) {
+const getProjectOwnerFile = async (ownersPath, filename) => {
+    if (!ownersPath) {
         return null;
     }
 
-    const projectOwnersFile = path.join(projectOwnersPath, filename);
+    const projectOwnersFile = path.join(ownersPath, filename);
     const fileExists = await fse.pathExists(projectOwnersFile);
 
     if (fileExists) {
@@ -103,7 +103,7 @@ const findOwnerFiles = async (options) => {
         filename,
         directory,
         regex,
-        projectOwnersPath
+        ownersPath
     } = options;
 
     if (!filename) {
@@ -116,7 +116,7 @@ const findOwnerFiles = async (options) => {
 
 
     const foundFiles = [];
-    const projectOwnersFile = await getProjectOwnerFile(projectOwnersPath, filename);
+    const projectOwnersFile = await getProjectOwnerFile(ownersPath, filename);
 
     if (projectOwnersFile) {
         foundFiles.push(projectOwnersFile);
@@ -134,7 +134,7 @@ module.exports = { findOwnerFiles }
  * @prop {string} filename
  * @prop {string} directory
  * @prop {RegExp} [regex]
- * @prop {string} [projectOwnersPath]
+ * @prop {string} [ownersPath]
  */
 
 /**

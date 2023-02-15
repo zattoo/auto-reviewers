@@ -29624,14 +29624,14 @@ const createOwnersFileMap = async (options) => {
         changedFiles,
         filename,
         regex,
-        projectOwnersPath
+        ownersPath
     } = options;
 
     /** @type {Record<string, string[]>} */
     const ownersFileMap = {};
 
     const ownersFilesQueue = changedFiles.map(async (filePath) => {
-       const ownerFiles = await findOwnerFiles({filename, directory: filePath, regex, projectOwnersPath});
+       const ownerFiles = await findOwnerFiles({filename, directory: filePath, regex, ownersPath});
 
         ownerFiles.forEach((ownerFile) => {
             if (!ownersFileMap[ownerFile]) {
@@ -29689,7 +29689,7 @@ module.exports = {createOwnersMap};
  * @prop {string[]} changedFiles
  * @prop {string} filename
  * @prop {RegExp} [regex]
- * @prop {string} [projectOwnersPath]
+ * @prop {string} [ownersPath]
  */
 
 /**
@@ -29906,16 +29906,16 @@ const nextLevelUp = (directory) => {
 
 /**
  *
- * @param {string} projectOwnersPath
+ * @param {string} ownersPath
  * @param {string} filename
  * @returns {Promise<string>}
  */
-const getProjectOwnerFile = async (projectOwnersPath, filename) => {
-    if (!projectOwnersPath) {
+const getProjectOwnerFile = async (ownersPath, filename) => {
+    if (!ownersPath) {
         return null;
     }
 
-    const projectOwnersFile = path.join(projectOwnersPath, filename);
+    const projectOwnersFile = path.join(ownersPath, filename);
     const fileExists = await fse.pathExists(projectOwnersFile);
 
     if (fileExists) {
@@ -29990,7 +29990,7 @@ const findOwnerFiles = async (options) => {
         filename,
         directory,
         regex,
-        projectOwnersPath
+        ownersPath
     } = options;
 
     if (!filename) {
@@ -30003,7 +30003,7 @@ const findOwnerFiles = async (options) => {
 
 
     const foundFiles = [];
-    const projectOwnersFile = await getProjectOwnerFile(projectOwnersPath, filename);
+    const projectOwnersFile = await getProjectOwnerFile(ownersPath, filename);
 
     if (projectOwnersFile) {
         foundFiles.push(projectOwnersFile);
@@ -30021,7 +30021,7 @@ module.exports = { findOwnerFiles }
  * @prop {string} filename
  * @prop {string} directory
  * @prop {RegExp} [regex]
- * @prop {string} [projectOwnersPath]
+ * @prop {string} [ownersPath]
  */
 
 /**
@@ -30511,7 +30511,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     const ownersFilename = core.getInput('source', {required: true});
     const ignoreFiles = core.getMultilineInput('ignore', {required: true});
     const labelsMap = core.getInput('labels', {required: false});
-    const projectOwnersPath = core.getInput('project_owners_path', {required: false});
+    const ownersPath = core.getInput('owners_path', {required: false});
     const octokit = getOctokit(token);
 
     const {repo} = context;
@@ -30786,7 +30786,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         filename: ownersFilename,
         regex: utils.getRegex(level, PATH_PREFIX),
         creator,
-        projectOwnersPath
+        ownersPath
     });
 
     const codeowners = await utils.getOwners(ownersMap, path.join(PATH_PREFIX, ownersFilename), creator);

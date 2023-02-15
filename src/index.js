@@ -15,7 +15,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     const ownersFilename = core.getInput('source', {required: true});
     const ignoreFiles = core.getMultilineInput('ignore', {required: true});
     const labelsMap = core.getInput('labels', {required: false});
-    const projectOwnersPath = core.getInput('project_owners_path', {required: false});
+    const ownersPath = core.getInput('owners_path', {required: false});
     const octokit = getOctokit(token);
 
     const {repo} = context;
@@ -290,7 +290,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         filename: ownersFilename,
         regex: utils.getRegex(level, PATH_PREFIX),
         creator,
-        projectOwnersPath
+        ownersPath
     });
 
     const codeowners = await utils.getOwners(ownersMap, path.join(PATH_PREFIX, ownersFilename), creator);

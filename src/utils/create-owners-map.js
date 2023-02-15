@@ -10,14 +10,14 @@ const createOwnersFileMap = async (options) => {
         changedFiles,
         filename,
         regex,
-        projectOwnersPath
+        ownersPath
     } = options;
 
     /** @type {Record<string, string[]>} */
     const ownersFileMap = {};
 
     const ownersFilesQueue = changedFiles.map(async (filePath) => {
-       const ownerFiles = await findOwnerFiles({filename, directory: filePath, regex, projectOwnersPath});
+       const ownerFiles = await findOwnerFiles({filename, directory: filePath, regex, ownersPath});
 
         ownerFiles.forEach((ownerFile) => {
             if (!ownersFileMap[ownerFile]) {
@@ -75,7 +75,7 @@ module.exports = {createOwnersMap};
  * @prop {string[]} changedFiles
  * @prop {string} filename
  * @prop {RegExp} [regex]
- * @prop {string} [projectOwnersPath]
+ * @prop {string} [ownersPath]
  */
 
 /**
