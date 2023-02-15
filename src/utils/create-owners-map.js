@@ -17,7 +17,12 @@ const createOwnersFileMap = async (options) => {
     const ownersFileMap = {};
 
     const ownersFilesQueue = changedFiles.map(async (filePath) => {
-       const ownerFiles = await findOwnerFiles({filename, directory: filePath, regex, ownersPath});
+       const ownerFiles = await findOwnerFiles({
+           filename,
+           directory: filePath,
+           regex,
+           ownersPath
+        });
 
         ownerFiles.forEach((ownerFile) => {
             if (!ownersFileMap[ownerFile]) {
