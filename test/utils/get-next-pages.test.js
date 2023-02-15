@@ -34,4 +34,5 @@ describe(getNextPages.name, () => {
 });
 
 
+// @ts-ignore
 /** @typedef {import('../../src/interfaces').GitHub.ResponseHeaders} ResponseHeaders */

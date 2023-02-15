@@ -15,7 +15,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     const ownersFilename = core.getInput('source', {required: true});
     const ignoreFiles = core.getMultilineInput('ignore', {required: true});
     const labelsMap = core.getInput('labels', {required: false});
-
+    const ownersPath = core.getInput('owners_path', {required: false});
     const octokit = getOctokit(token);
 
     const {repo} = context;
@@ -23,7 +23,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     const pull_number = pull_request.number;
 
     /**
-     * @returns {string[]}
+     * @returns {Promise<string[]>}
      */
     const getChangedFiles = async () => {
         const listFiles = await octokit.paginate(octokit.rest.pulls.listFiles.endpoint.merge({
@@ -55,7 +55,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     }
 
     /**
-     * @returns {$Reviewers.GitHub.Review[]}
+     * @returns {Promise<$Reviewers.GitHub.Review[]>}
      */
     const getListReviews = async () => {
         const route = `GET /repos/${repo.owner}/${repo.repo}/pulls/${pull_number}/reviews`;
@@ -148,7 +148,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     /**
      * @param {string[]} codeowners
      * @param {string[]} reviewers
-     * @returns {Promise<OwnersMap>}
+     * @returns {Promise<void>}
      */
     const assignReviewers = async (codeowners, reviewers) => {
         const {repo} = context;
@@ -157,7 +157,7 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
         let requestedReviewers = [];
 
 
-        const requestedReviewersResponse = /** @type {RequestedReviewers} */((await octokit.rest.pulls.listRequestedReviewers({
+        const requestedReviewersResponse = ((await octokit.rest.pulls.listRequestedReviewers({
             ...repo,
             pull_number,
         })).data);
@@ -207,7 +207,10 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
             return latestUserReviewMap[reviewer].state === ReviewStates.APPROVED;
         });
 
+        /** @type {string[]} */
         const filesRequired = [];
+
+        /** @type {string[]} */
         let ownersRequired = [];
 
         Object.entries(ownersMap).forEach(([file, owners]) => {
@@ -281,7 +284,15 @@ const PATH_PREFIX = process.env.GITHUB_WORKSPACE;
     const latestUserReviewMap = utils.getLatestUserReviewMap(listReviews);
     const filteredChangedFiles = utils.filterChangedFiles(changedFiles, ignoreFiles);
     const creator = pull_request.user.login;
-    const ownersMap = await utils.createOwnersMap(filteredChangedFiles, ownersFilename, utils.getRegex(level, PATH_PREFIX), creator);
+
+    const ownersMap = await utils.createOwnersMap({
+        changedFiles: filteredChangedFiles,
+        filename: ownersFilename,
+        regex: utils.getRegex(level, PATH_PREFIX),
+        creator,
+        ownersPath
+    });
+
     const codeowners = await utils.getOwners(ownersMap, path.join(PATH_PREFIX, ownersFilename), creator);
 
     core.info(`level is: ${level}`);

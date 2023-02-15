@@ -19,6 +19,7 @@ const filterCreator = (owners, creator) => {
  * @returns {Promise<string[]>}
  */
 const getOwners = async (ownersMap, filename, creator) => {
+    /** @type {string[]} */
     let owners = [];
 
     Object.values(ownersMap).forEach((fileOwners) => {

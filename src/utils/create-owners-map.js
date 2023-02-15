@@ -1,17 +1,28 @@
-const {findNearestFiles} = require('./find-nearest-files');
+const {findOwnerFiles} = require('./find-owner-files');
 const {readFile} = require('./read-file');
 
 /**
- * @param {string[]} changedFiles
- * @param {string} filename
- * @param {RegExp} regex
+ * @param {CreateOwnersMapOptions} options
  * @returns {Promise<Record<string, string[]>>}
  */
-const createOwnersFileMap = async (changedFiles, filename, regex) => {
+const createOwnersFileMap = async (options) => {
+    const {
+        changedFiles,
+        filename,
+        regex,
+        ownersPath
+    } = options;
+
+    /** @type {Record<string, string[]>} */
     const ownersFileMap = {};
 
     const ownersFilesQueue = changedFiles.map(async (filePath) => {
-        const ownerFiles = await findNearestFiles(filename, filePath, regex);
+       const ownerFiles = await findOwnerFiles({
+           filename,
+           directory: filePath,
+           regex,
+           ownersPath
+        });
 
         ownerFiles.forEach((ownerFile) => {
             if (!ownersFileMap[ownerFile]) {
@@ -28,14 +39,13 @@ const createOwnersFileMap = async (changedFiles, filename, regex) => {
 };
 
 /**
- * @param {string[]} changedFiles
- * @param {string} filename
- * @param {RegExp} regex
- * @param {string} creator
+ * @param {CreateOwnersMapOptions} options
  * @returns {Promise<$Reviewers.OwnersMap>}
  */
-const createOwnersMap = async (changedFiles, filename, regex, creator) => {
-    const ownersFileMap = await createOwnersFileMap(changedFiles, filename, regex);
+const createOwnersMap = async (options) => {
+
+    const {creator, ...createOwnersFileMapOptions} = options;
+    const ownersFileMap = await createOwnersFileMap(createOwnersFileMapOptions);
 
     const fileQueue = Object.entries(ownersFileMap).map(async ([ownersFile, changedFilesList]) => {
         const owners = (await readFile(ownersFile)).filter((owner) => owner !== creator);
@@ -48,7 +58,7 @@ const createOwnersMap = async (changedFiles, filename, regex, creator) => {
 
     const files = await Promise.all(fileQueue);
 
-    const map = files.reduce((result, info) => {
+    const map = files.reduce((/** @type {Record<string, string[]>} **/ result, info) => {
         info.changedFilesList.forEach((changedFile) => {
             if (!result[changedFile]) {
                 result[changedFile] = [];
@@ -64,3 +74,17 @@ const createOwnersMap = async (changedFiles, filename, regex, creator) => {
 };
 
 module.exports = {createOwnersMap};
+
+/**
+ * @typedef {Object} CreateOwnersFileMapOptions
+ * @prop {string[]} changedFiles
+ * @prop {string} filename
+ * @prop {RegExp} [regex]
+ * @prop {string} [ownersPath]
+ */
+
+/**
+ * @typedef {CreateOwnersFileMapOptions & {creator?: string}}  CreateOwnersMapOptions
+ */
+
+

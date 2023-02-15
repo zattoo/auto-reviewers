@@ -1,12 +1,12 @@
 const fse = require('fs-extra');
 
 /**
- * @param path
+ * @param {string} path
  * @returns {Promise<string[]>}
  */
 const readFile = async (path) => {
     if (!path) {
-        return Promise.resolve('');
+        return Promise.resolve(['']);
     }
 
     try {
