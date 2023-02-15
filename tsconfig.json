@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+      // Type Checking
+      "strict": true,
+      "strictNullChecks": false,
+      "noImplicitAny": true,
+      "noImplicitReturns": true,
+      "noUnusedLocals": true,
+      "noUnusedParameters": true,
+      "noUncheckedIndexedAccess": true,
+
+      // Modules
+      "types": ["jest"],
+      "module": "esnext",
+      "target": "esnext",
+      "moduleResolution": "node",
+      "baseUrl": "src",
+
+
+      // JavaScript Support
+      "allowJs": true,
+      "checkJs": true,
+
+      // Projects
+      "outDir": ".tmp/ts-build/reviewers",
+      "skipLibCheck": true,
+  },
+  "exclude": ["dist"]
+}
