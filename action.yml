@@ -13,6 +13,10 @@ inputs:
   labels:
     description: 'Record, with `label` keys and regex path values.'
     required: false
+  owners_path:
+    description: 'Path to a `source` to fetch owners from. When provided, the action will assign the reviewers from the owners found in this path.'
+    required: false
+
 runs:
   using: 'node12'
   main: 'dist/index.js'
