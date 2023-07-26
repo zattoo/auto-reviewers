@@ -37,7 +37,7 @@
         "@octokit/types": "11.1.0",
         "@types/fs-extra": "11.0.0",
         "@types/jest": "29.5.3",
-        "@types/lodash": "4.14.195",
+        "@types/lodash": "4.14.196",
         "@types/parse-link-header": "2.0.1",
         "@vercel/ncc": "0.36.0",
         "eslint": "8.44.0",
